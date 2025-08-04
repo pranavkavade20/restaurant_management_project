@@ -2,10 +2,7 @@ from django.db import models
 from django.core.validatiors import RegexValidator
 from django.contrib.auth.models import User
 
-"""
-User Profile model for saving information of authenticated users.
-
-"""
+#User Profile model for saving information of authenticated users.
 class UserProfile(models.Model):
     # Save the name of user.
     name = models.CharField(max_length=50)
@@ -13,22 +10,16 @@ class UserProfile(models.Model):
     email = models.EmailField(max_length=25, unique=True)
     # Phone number of user with validation/
     phone_number = models.CharField(
-        max_length=15, # Adjust the length of phone number digits.
+        max_length=20, # Adjust the length of phone number digits.
         validatiors=[
             RegexValidator(
                 regex=r'^\+?1?\d{9,15}$', # regex for international phone numbers
                 message = "Phone number must be entered in the format : +9999999999. Up to digits allowed."
             )
-        ],
-        unique=True
+        ]
     )
 
-
-""" 
-
-Menu model create for store menu.
-
-"""
+# Menu model create for store menu.
 class Menu(modes.Model):
     # Store Menu Item.
     name = models.CharField(max_length=150)
@@ -38,11 +29,7 @@ class Menu(modes.Model):
     def __str_(self):
         return self.name
 
-
-"""
-Order model that store the orders.
-
-"""
+# Order model that store the orders.
 class Order(models.Model):
     # Choices that show status realted to order_status.
     STATUS_CHOICES =[
@@ -68,10 +55,9 @@ class Order(models.Model):
         # Return username(customer) with id
         return f"Order #{self.id} by {self.customer.username}"
 
-""" 
-OrderItem field related to Order for storing order item specifically.
 
-"""
+# OrderItem field related to Order for storing order item specifically.
+
 class OrderItem(models.Model):
     # It store order items spcifically related to order model.
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
