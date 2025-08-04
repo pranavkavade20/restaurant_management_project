@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validatiors import RegexValidator
 from django.contrib.auth.models import User
+from products.models import Item
 
 # Order model that store the orders.
 class Order(models.Model):
@@ -36,7 +37,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
 
     # This help to store menu specifically in OrderItem model. This connected to menu model which has menus.
-    menu_item = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(Item, on_delete=models.CASCADE)
 
     # It store quantiy of items.
     quantity = models.PositiveIntegerField(default=1)
@@ -49,5 +50,6 @@ class OrderItem(models.Model):
         # Returns total price of menu_item with help of quantity.
 
         return self.menu_item.price * self.quantity
+
 
 
