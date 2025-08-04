@@ -2,16 +2,6 @@ from django.db import models
 from django.core.validatiors import RegexValidator
 from django.contrib.auth.models import User
 
-# Menu model create for store menu.
-class Menu(modes.Model):
-    # Store Menu Item.
-    name = models.CharField(max_length=150)
-    # Store Price.
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-
-    def __str_(self):
-        return self.name
-
 # Order model that store the orders.
 class Order(models.Model):
     # Choices that show status realted to order_status.
@@ -59,4 +49,5 @@ class OrderItem(models.Model):
         # Returns total price of menu_item with help of quantity.
 
         return self.menu_item.price * self.quantity
+
 
