@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validatiors import RegexValidator
+from django.contrib.auth.models import User
 
 # Menu model create for store menu.
 class Menu(modes.Model):
@@ -58,3 +59,4 @@ class OrderItem(models.Model):
         # Returns total price of menu_item with help of quantity.
 
         return self.menu_item.price * self.quantity
+
