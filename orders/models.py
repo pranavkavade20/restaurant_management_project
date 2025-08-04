@@ -11,12 +11,18 @@ class UserProfile(models.Model):
     email = models.EmailField(max_length=25, unique=True)
     # Phone number of user with validation/
     phone_number = models.CharField(
-        max_length=20, # Adjust the length of phone number digits.
+        max_length=15, # Adjust the length of phone number digits.
         validatiors=[
             RegexValidator(
                 regex=r'^\+?1?\d{9,15}$', # regex for international phone numbers
                 message = "Phone number must be entered in the format : +9999999999. Up to digits allowed."
             )
-        ]
-
+        ],
+        unique=True
     )
+
+class Order(models.Model):
+    customer = 
+    order_items =
+    total_amount =
+    order_status =
