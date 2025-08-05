@@ -1,7 +1,15 @@
 from django.db import models
 from django.core.validatiors import RegexValidator
 from django.contrib.auth.models import User
-from products.models import Menu
+
+# Menu model
+class Menu(models.Model):
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=8,decimal_places=2)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
 
 # Order model that store the orders.
 class Order(models.Model):
