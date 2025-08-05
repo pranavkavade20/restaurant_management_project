@@ -27,8 +27,8 @@ class ItemView(APIView):
 
 
 # API endpoint for restaurant menu.
-
-@api_view(['GET'])
+# GET is used to return menu as API.
+@api_view(['GET']) 
 def get_menu(request):
     menu = [
         {
