@@ -5,14 +5,11 @@ from rest_framework import status
 
 from .models import Item
 from .serializers import ItemSerializer
-
 '''
 NOTE: Conside this as a reference and follow this same coding structure or format to work on you tasks
 '''
-
 # Create your views here.
 class ItemView(APIView):
-
     def get(self, request):
         items = Item.objects.all()
         serializer = ItemSerializer(items, many=True)
@@ -24,8 +21,6 @@ class ItemView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 # API endpoint for restaurant menu.
 # GET is used to return menu as API.
 @api_view(['GET']) 
@@ -42,5 +37,4 @@ def get_menu(request):
             "price":250.00
         }
     ]
-
     return Response(menu)
