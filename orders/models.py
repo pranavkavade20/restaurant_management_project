@@ -1,7 +1,33 @@
 from django.db import models
 from django.core.validatiors import RegexValidator
 from django.contrib.auth.models import User
-from products.models import Item
+
+#User Profile model for saving information of authenticated users.
+class UserProfile(models.Model):
+    # Save the name of user.
+    name = models.CharField(max_length=50)
+    # Email of user for logging.     
+    email = models.EmailField(max_length=25, unique=True)
+    # Phone number of user with validation/
+    phone_number = models.CharField(
+        max_length=20, # Adjust the length of phone number digits.
+        validatiors=[
+            RegexValidator(
+                regex=r'^\+?1?\d{9,15}$', # regex for international phone numbers
+                message = "Phone number must be entered in the format : +9999999999. Up to digits allowed."
+            )
+        ]
+    )
+
+# Menu model create for store menu.
+class Menu(modes.Model):
+    # Store Menu Item.
+    name = models.CharField(max_length=150)
+    # Store Price.
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+
+    def __str_(self):
+        return self.name
 
 # Order model that store the orders.
 class Order(models.Model):
@@ -37,7 +63,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
 
     # This help to store menu specifically in OrderItem model. This connected to menu model which has menus.
-    menu_item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(Menu, on_delete=models.CASCADE)
 
     # It store quantiy of items.
     quantity = models.PositiveIntegerField(default=1)
@@ -48,8 +74,4 @@ class OrderItem(models.Model):
     
     def get_item_total(self):
         # Returns total price of menu_item with help of quantity.
-
         return self.menu_item.price * self.quantity
-
-
-
