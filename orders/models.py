@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validatiors import RegexValidator
 from django.contrib.auth.models import User
-
+from products.models import Item
 # Menu model
 class Menu(models.Model):
     name = models.CharField(max_length=100)
@@ -14,7 +14,7 @@ class Menu(models.Model):
 # Order model that store the orders.
 class Order(models.Model):
     # Choices that show status realted to order_status.
-    STATUS_CHOICES =[
+    STATUS_CHOICES = [
         ('PENDING','Pending'),
         ('PROCESSING','Processing'),
         ('DELIVERED','Delivered'),
@@ -23,13 +23,10 @@ class Order(models.Model):
 
     # This field connected to User. 
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders') 
-    
     # It store decimal field to store total price of menu.
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-
     # It store status of order.
     order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
-
     # It store the time at the created of Order.
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -40,19 +37,18 @@ class Order(models.Model):
 
 # OrderItem field related to Order for storing order item specifically.
 class OrderItem(models.Model):
+   
     # It store order items spcifically related to order model.
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
     # This help to store menu specifically in OrderItem model. This connected to Item model which has menus.
-    menu_item = models.ForeignKey(Menu, on_delete=models.CASCADE)
-
+    menu_item = models.ForeignKey(Item, on_delete=models.CASCADE)
     # It store quantiy of items.
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         # Returns quantity of menu items.
-        return f"{self.quantity} X {self.menu_item.name}"
+        return f"{self.quantity} X {self.menu_item.name} (Order # {self.order.id})"
     
-    def get_item_total(self):
+    def get_item_total(self): 
         # Returns total price of menu_item with help of quantity.
         return self.menu_item.price * self.quantity
