@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validatiors import RegexValidator
+from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from products.models import Item
 
