@@ -26,3 +26,21 @@ class ItemView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# API endpoint for restaurant menu.
+
+@api_view(['GET'])
+def get_menu(request):
+    menu = [
+        {
+            "name":"Paneer Butter Masala",
+            "description": "Cottage cheese in a rich tomato-based gravy",
+            "price":220.00 
+        },
+        {
+            "name":"Chicken Biryani",
+            "description": "Frangrant rice cooked with marinated chicken and spices",
+            "price":250.00
+        }
+    ]
+
+    return Response(menu)
