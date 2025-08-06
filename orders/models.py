@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
 from products.models import Item
 
@@ -43,4 +42,5 @@ class OrderItem(models.Model):
     
     def get_item_total(self): 
         # Returns total price of menu_item with help of quantity.
+
         return self.menu_item.price * self.quantity
