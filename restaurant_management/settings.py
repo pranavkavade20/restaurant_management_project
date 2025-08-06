@@ -130,4 +130,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Restaurant Name
 
-RESTAURANT_NAME ="Ganesh Restaurant"
+RESTAURANT_NAME="Ganesh Restaurant"
