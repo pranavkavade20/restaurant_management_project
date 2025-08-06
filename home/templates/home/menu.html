@@ -2,24 +2,19 @@
 <html lang="en">
     <head>
         <title>Restaurant Menu</title>
-        <script src="https://cdn.tailwindcss.com"></script>
     </head>
-    <body class="bg-gray-100 text-gray-800 font-sans">
-        <div class="max-w-4xl mx-auto py-10 px-4">
-            <h1 class= "text-4xl font-bold mb-8 text-center text-red-600">Restaurant Menu</h1>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {% for item in menu %}
-                    <div class="bg-white p-6 rounded-bg shadow-md hover:shadow-lg transition duration-300">
-                        <h3 class="text-xl font-semibold text-gray-900">{{ item.name }}</h3>
-                        <p class="text-green-600 font-bold mt-3">{{ item.description }}</p>
-                        <p class="text-green-600 font-bold mt-3">{{ item.price }}</p>
-                    </div>
-                {% empty %}
-                <p class="text-green-600 font-bold mt-3">
-                    No menu items are available......!
-                </p>
-                {% endfor %}
+    <body>
+        <h1>Restaurant Menu</h1>
+        {% for item in menu %}
+            <div>
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.description }}</p>
+                <p>{{ item.price }}</p>
             </div>
-        </div>
+        {% empty %}
+        <p>
+            No menu items are available......!
+        </p>
+        {% endfor %}
     </body>
-</html
+</html>
