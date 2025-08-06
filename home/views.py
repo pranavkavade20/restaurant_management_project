@@ -2,7 +2,7 @@ from django.shortcuts import render
 import requests
 
 # Home page
-def home(request):
+def homepage_view(request):
     return render(request,'home/index.html')
 
 # View for fetching API Response.
