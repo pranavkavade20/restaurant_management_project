@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.core.validators import RegexValidator
 #User Profile model for saving information of authenticated users.
 class UserProfile(models.Model):
     # Save the name of user.
@@ -17,4 +17,5 @@ class UserProfile(models.Model):
             )
         ]
     )
+
 
