@@ -1,6 +1,10 @@
 from django.shortcuts import render
 import requests
 
+# Home page
+def home(request):
+    return render(request,'home/index.html')
+
 # View for fetching API Response.
 def menu_view(request):
     try:
