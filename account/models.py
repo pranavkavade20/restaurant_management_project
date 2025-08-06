@@ -10,12 +10,13 @@ class UserProfile(models.Model):
     # Phone number of user with validation/
     phone_number = models.CharField(
         max_length=20, # Adjust the length of phone number digits.
-        validatiors=[
+        validators = [
             RegexValidator(
                 regex=r'^\+?1?\d{9,15}$', # regex for international phone numbers
                 message = "Phone number must be entered in the format : +9999999999. Up to digits allowed."
             )
         ]
     )
+
 
 
