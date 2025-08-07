@@ -20,5 +20,10 @@ def menu_view(request):
     # Render data to frontend.
     return render(request, 'home/menu.html',{'menu':menu_data})
 
+# 404 page
 def trigger_404(request):
     return render(request,"404.html", status = 404)
+
+# about page
+def about_view(request):
+    return render(request,'about.html')
