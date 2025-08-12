@@ -1,24 +1,37 @@
-{% extends "home/index.html"%}
-{% load static %}
-{% block title %} About Page {% endblock%}
+{% extends "base.html" %}
+{% load static %} 
+
+{% block title %}About Us{% endblock %}
 
 {% block content %}
-    <div class="flex flex-col md:flex-row gap-8 items-center">
-        <h1 class="text-4xl font-bold text-center mb-6">About our Restaurant</h1>
-        <img src={% static 'images/restaurantImage.avif' %} alt="Restaurant Image" class="rounded-lg  shadow-lg full md:w-1/2">
-        <div class="text-lg leading-relaxed">
-            <p>
-                <strong>My Restaurant</strong> was founded  with the mission of serving authentic and delicious food using only the freshest ingredients.
-                Our chefs are passionate about blending traditional flavors with modern culinary techniques.
-            </p>
-            <p class="mt-4">
-                Whether you're joining us for a quick lucnch or a family dinner, we strive to provide a welcoming and memorable dining experience.
-            </p>
-            <p class="mt-4 text-green-700 font-semibold">
-                Visit us and taste the love in every bite!
+<div class="bg-gradient-to-br from-[#fff5f2] via-[#fff0ec] to-[#ffece6] py-10 px-auto">
+    <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-8 text-[#e23744]">
+        About Our Swaadify
+    </h1>
 
+    <div class="flex flex-col md:flex-row gap-8 items-center max-w-6xl mx-auto">
+        <img src="{% static 'images/Hero-Section.avif' %}" 
+             alt="Restaurant Interior" 
+             class="rounded-xl shadow-xl w-full md:w-1/2 border-4 border-[#ff914d]">
+
+        <div class="text-lg leading-relaxed text-gray-800">
+            <p class="mb-4">
+                <strong class="text-[#ff914d]">Swaadify</strong> was founded with the passion to serve 
+                <span class="font-semibold text-[#e23744]">authentic and mouth-watering dishes</span> 
+                crafted from the freshest ingredients. 
+                Our talented chefs blend traditional recipes with a modern twist to delight your taste buds.
             </p>
 
+            <p class="mb-4">
+                Whether it’s a quick bite, a romantic dinner, or a family feast, 
+                we promise a warm ambiance and a memorable dining experience — 
+                just like your favorite neighborhood eatery.
+            </p>
+
+            <p class="text-[#e23744] font-semibold text-lg">
+                Come, savor the flavors. Your table is waiting!
+            </p>
         </div>
-    </div>   
-{% endblock %}            
+    </div>
+</div>
+{% endblock %}
