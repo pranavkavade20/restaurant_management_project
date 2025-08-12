@@ -1,24 +1,35 @@
-{% extends "home/index.html" %}
-{% block title %} Restaurant Menu{% endblock %}
+{% extends "base.html" %}
+{% block title %}Restaurant Menu{% endblock %}
 {% block content %}
 
-<div class="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <h1 class="text-4xl font-bold text-center text-red-600mb-10">Restaurant Menu</h1>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols gap-5">
-            {% for item in menu %}
-                <div class="text-xl font-semibold text-gray-900 group-hover:text-red-600 
-                transition-colors duration-200">
-                    <h3 class="text-xl font-semibold text-gray-900
-                    group-hover:text-red-600 transition-colors duration-200">{{ item.name }}</h3>
-                    <p class="mt-2 text-gray-600 group-hover:text-gray-800">{{ item.description }}</p>
-                    <p class="mt-4 text-green-600 font-bold text-lg group-hover:text-green-700">{{ item.price }}</p>
-                </div>
-            {% empty %}
-            <p class="col-span-full text-center text-gray-500">
-                No menu items are available......!
-            </p>
-            {% endfor %}
-        </div>
-</div>
-{% endblock %}
+<div class="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-screen">
+  <h1 class="text-4xl font-bold text-center text-red-600 mb-10">🍽️ Swaadify Menu</h1>
 
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    {% for item in menu %}
+      <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+        
+        {# Optional: Only render image if available #}
+        {% if item.image_url %}
+          <img src="{{ item.image_url }}" alt="{{ item.name }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+        {% endif %}
+
+        <div class="p-6">
+          <h3 class="text-xl font-semibold text-gray-900 group-hover:text-red-600 transition-colors duration-200">
+            {{ item.name }}
+          </h3>
+          <p class="mt-2 text-gray-600 group-hover:text-gray-800 transition-colors duration-200">
+            {{ item.description }}
+          </p>
+          <p class="mt-4 text-green-600 font-bold text-lg group-hover:text-green-700">
+            ₹ {{ item.price }}
+          </p>
+        </div>
+      </div>
+    {% empty %}
+      <p class="col-span-full text-center text-gray-500">No menu items available.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
