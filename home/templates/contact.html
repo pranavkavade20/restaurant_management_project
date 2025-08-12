@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Contact Us - {{ restaurant_name }}
+{% endblock %}
+
+{% block content %}
+<section class="bg-white py-12 px-6 sm:px-8 lg:px-12">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-extrabold text-orange-600 mb-6 text-center">Contact Us</h1>
+        <p class="text-lg text-gray-600 text-center mb-12">
+            Have questions or feedback? We'd love to hear from you.
+        </p>
+    <!-- Contact Info -->
+    <div class="bg-orange-50 rounded-xl shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-bold text-orange-700">Our Contact Information</h2>
+        <p class="mb-2"><strong>Address:</strong>123 Shahapur, Ichalkaranji, India</p>
+        <p class="mb-2"><strong>Phone:</strong>+91 12345 67890</p>
+        <p class="mb-2"><strong>Email:</strong>contact@Swaadify.in</p>
+        <p class="mb-2"><strong>Working Hours:</strong>10:00 AM - 11:00 PM (Mon-Sun</p>
+    </div>
+    
+</section>
+{% endblock %}
+
