@@ -133,7 +133,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Restaurant Name
+# Restaurant Details
 RESTAURANT_NAME="Swaadify"
+RESTAURANT_PHONE="+91 1234567890"
 
 ALLOWED_HOSTS =['*']
