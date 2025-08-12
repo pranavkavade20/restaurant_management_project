@@ -27,6 +27,10 @@ def menu_view(request):
 def trigger_404(request):
     return render(request,"404.html", status = 404)
 
-# about page
+# About page
 def about_view(request):
     return render(request,'about.html')
+
+# Contact page
+def contact_us(request):
+    return render(request,'contact.html')
