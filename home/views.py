@@ -1,10 +1,11 @@
 from django.shortcuts import render
 import requests
 from django.conf import settings
-# Home page
+
+# Display Restaurant name
 def homepage_view(request):
-    restaurant_name = getattr(settings, 'RESTAURANT_NAME', 'My Restaurant')
-    return render(request, 'home/home.html', {'restaurant_name': restaurant_name})
+    restaurant_name = getattr(settings,"RESTAURANT_NAME","My Restaurant")
+    return render(request, 'home/home.html', {'restaurant_name':restaurant_name})
 
 # View for fetching API Response.
 def menu_view(request):
@@ -21,7 +22,8 @@ def menu_view(request):
 
 # 404 page
 def trigger_404(request):
-    return render(request, '404.html', status=404)
+    return render(request,"404.html", status = 404)
 
+# about page
 def about_view(request):
-    return render(request, 'about.html')
+    return render(request,'about.html')
