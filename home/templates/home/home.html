@@ -7,51 +7,51 @@ Welcome to {{ restaurant_name }}
 
 {% block content %}
 <!-- Full Page Container -->
-<section class="min-h-screen flex items-center justify-center px-4 py-12">
-  <div class="bg-white shadow-2xl rounded-3xl overflow-hidden max-w-6xl w-full flex flex-col md:flex-row">
+<section class="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-orange-50 via-white to-red-50 font-sans">
+  <div class="bg-white shadow-2xl rounded-3xl overflow-hidden max-w-6xl w-full flex flex-col md:flex-row border border-gray-200">
     
     <!-- Left Text Content -->
     <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative">
-      <h1 class="text-5xl font-extrabold text-[#e23744] leading-tight">
+      <h1 class="text-5xl md:text-6xl font-extrabold text-[#e23744] leading-tight tracking-tight drop-shadow-sm">
         Good Food <br> Good Life
       </h1>
-      <h2 class="text-2xl text-[#ff914d] font-bold mt-2">
+      <h2 class="text-2xl md:text-3xl text-[#ff914d] font-bold mt-3">
         Healthy Lunch for You
       </h2>
-      <p class="text-gray-700 mt-4">
+      <p class="text-gray-700 mt-5 leading-relaxed text-lg">
         Experience mouth-watering flavors and fresh, high-quality ingredients prepared with passion.
         Join us for a meal that’s as nourishing as it is delicious.
       </p>
       <a href="{% url 'menu' %}" 
-         class="mt-6 bg-[#e23744] hover:bg-[#ff4f5a] text-white px-6 py-3 rounded-full text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">
+         class="mt-8 inline-block bg-[#e23744] hover:bg-[#ff4f5a] text-white px-7 py-3 rounded-full text-lg font-semibold shadow-lg transition-all transform hover:scale-105 hover:shadow-xl duration-300 ease-in-out">
         🍽 Check our Menu
       </a>
-      <p class="mt-4 text-lg font-semibold text-[#ff914d]">
-        📞 Call us on {{ restaurant_phone}}
+      <p class="mt-5 text-lg font-semibold text-[#ff914d] flex items-center gap-2">
+        📞 Call us on {{ restaurant_phone }}
       </p>
 
       <!-- Decorative icons -->
-      <img src="{% static 'images/tomato.png' %}" class="absolute bottom-4 left-4 w-10" alt="">
-      <img src="{% static 'images/leaf.png' %}" class="absolute top-6 left-6 w-8" alt="">
+      <img src="{% static 'images/tomato.png' %}" class="absolute bottom-4 left-4 w-12 opacity-80" alt="">
+      <img src="{% static 'images/leaf.png' %}" class="absolute top-6 left-6 w-10 opacity-80" alt="">
     </div>
 
     <!-- Right Image Section -->
     <div class="w-full md:w-1/2 relative bg-white flex items-center justify-center p-6">
-      <div class="rounded-full border-8 border-[#ff914d] overflow-hidden shadow-xl">
+      <div class="rounded-full border-8 border-[#ff914d] overflow-hidden shadow-2xl hover:shadow-orange-200 transition-shadow duration-300">
         <img src="{% static 'images/Hero-Section.avif' %}"
              alt="Healthy Salad" class="w-full h-full object-cover">
       </div>
 
       <!-- Social Icons -->
       <div class="absolute right-6 top-1/3 flex flex-col gap-4">
-        <a href="#" class="text-[#e23744] hover:text-[#ff4f5a]"><i class="fab fa-instagram text-xl"></i></a>
-        <a href="#" class="text-[#e23744] hover:text-[#ff4f5a]"><i class="fab fa-facebook text-xl"></i></a>
-        <a href="#" class="text-[#e23744] hover:text-[#ff4f5a]"><i class="fab fa-twitter text-xl"></i></a>
-        <a href="#" class="text-[#e23744] hover:text-[#ff4f5a]"><i class="fab fa-whatsapp text-xl"></i></a>
+        <a href="#" class="text-[#e23744] hover:text-[#ff4f5a] transition-colors duration-200"><i class="fab fa-instagram text-2xl"></i></a>
+        <a href="#" class="text-[#e23744] hover:text-[#ff4f5a] transition-colors duration-200"><i class="fab fa-facebook text-2xl"></i></a>
+        <a href="#" class="text-[#e23744] hover:text-[#ff4f5a] transition-colors duration-200"><i class="fab fa-twitter text-2xl"></i></a>
+        <a href="#" class="text-[#e23744] hover:text-[#ff4f5a] transition-colors duration-200"><i class="fab fa-whatsapp text-2xl"></i></a>
       </div>
 
       <!-- Decorative icons -->
-      <img src="{% static 'images/kiwi.jpg' %}" class="absolute bottom-6 right-6 w-10" alt="">
+      <img src="{% static 'images/kiwi.jpg' %}" class="absolute bottom-6 right-6 w-12 rounded-full shadow-md" alt="">
     </div>
 
   </div>
