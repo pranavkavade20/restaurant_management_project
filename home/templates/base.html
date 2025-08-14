@@ -23,12 +23,15 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <!-- Logo -->
-        <div class="flex-shrink-0">
-          <a href="{% url 'home' %}" class="text-2xl font-bold text-white hover:text-gray-100">
-          Swaadify
-          </a>
-        </div>
-        <!-- Links -->
+         <div class="flex items-center space-x-3">
+            <a href="{% url 'home' %}">
+                <img src="{% static 'images/logo.png' %}" alt="Swaadify Logo" class="h-10 w-10 rounded-full shadow-lg">
+            </a>
+            <a href="{% url 'home' %}" class="text-2xl font-bold text-white hover:text-gray-100">
+               Swaadify
+            </a>
+         </div>
+        <!-- Links for Navigartion-->
         <div class="hidden md:flex space-x-6">
           <a href="{% url 'home' %}" class="text-white hover:text-orange-200 font-medium">Home</a>
           <a href="{% url 'menu' %}" class="text-white hover:text-orange-200 font-medium">Menu</a>
