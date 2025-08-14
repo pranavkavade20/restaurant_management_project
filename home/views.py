@@ -4,6 +4,7 @@ from django.conf import settings
 
 # Display Restaurant name
 def homepage_view(request):
+    # Fetch name from settings.py in that already define.
    context ={
     'restaurant_name' : settings.RESTAURANT_NAME,
     'restaurant_phone': settings.RESTAURANT_PHONE
@@ -34,3 +35,12 @@ def about_view(request):
 # Contact page
 def contact_us(request):
     return render(request,'contact.html')
+
+# Reservation page
+def reservations(request):
+    # Fetch name from settings.py in that already define.
+    context ={
+    'restaurant_name' : settings.RESTAURANT_NAME,
+    'restaurant_phone': settings.RESTAURANT_PHONE
+    }
+    return render(request,"home/reservations.html",context)
