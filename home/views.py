@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import requests
 from django.conf import settings
+from django.db import DatabaseError # Import DatabaseError from Django
 
 # Display Restaurant name
 def homepage_view(request):
@@ -18,9 +19,13 @@ def menu_view(request):
         response = requests.get('http://localhost:8000/api/products/menu/')
         # Saving response in JSON format.
         menu_data = response.json()
-    except Exception as e:
-        # If exception occur then it save empty response.
+    except DatabaseError:
+        # If there's a database error, return empty data
         menu_data=[]
+    except Exception:
+        # Catching any other unexpected errors.
+        menu_data=[]
+        
     # Render data to frontend.
     return render(request, 'home/menu.html',{'menu':menu_data})
 
