@@ -2,13 +2,14 @@ from django.shortcuts import render
 import requests
 from django.conf import settings
 from django.db import DatabaseError # Import DatabaseError from Django
-
+from datatime import datetime # Import current datetime.
 # Display Restaurant name
 def homepage_view(request):
     # Fetch name from settings.py in that already define.
    context ={
     'restaurant_name' : settings.RESTAURANT_NAME,
-    'restaurant_phone': settings.RESTAURANT_PHONE
+    'restaurant_phone': settings.RESTAURANT_PHONE,
+    'year' : datetime.now().year
    }
    return render(request,'home/home.html',context)
 
