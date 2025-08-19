@@ -50,3 +50,20 @@ def reservations(request):
     'restaurant_phone': settings.RESTAURANT_PHONE
     }
     return render(request,"home/reservations.html",context)
+
+# Feedback page
+def feedback_view(request):
+    # Check the request is POST or not.
+    if request.method =="POST":
+        # Fetching form.
+        form = FeedbackForm(request.POST)
+        # Checking the form is valid.
+        if form.is_valid():
+            form.save() # Saving data of form.
+            # Showing success message for user.
+            messages.success(request,"Thanks for your feedback! ❤️")
+            return redirect("feedback") # back to the same page clean
+    else:
+    # Else the method is not POST then give empty form to user.
+        form = FeedbackForm()
+    return render(request,"home/feedback.html",{"form":form})
