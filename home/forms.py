@@ -1,7 +1,7 @@
 from django import forms
-from .models import Feedback
+from .models import *
 
-# Getting admin form for customize styling.
+# Getting admin feedback form for customize styling.
 class FeedbackForm(forms.ModelForm):
     class Meta:
         model = Feedback
@@ -14,3 +14,9 @@ class FeedbackForm(forms.ModelForm):
             })
         }
         labels ={"comment":"Your Feedback"}
+
+# Getting admin contact form
+class ContactForm(forms.ModelForm):
+    class Meta :
+        model = ContactForm
+        fields = ['name','email']
