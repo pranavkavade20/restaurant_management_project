@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from .models import Item
 from .serializers import ItemSerializer
+
 '''
 NOTE: Conside this as a reference and follow this same coding structure or format to work on you tasks
 '''
@@ -21,21 +22,24 @@ class ItemView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-# API endpoint for restaurant menu.
-# GET is used to return menu as API.
-@api_view(['GET']) 
-def get_menu(request):
-    menu = [
-        {
-            "name":"Paneer Butter Masala",
-            "description": "Cottage cheese in a rich tomato-based gravy",
-            "price":220.00 
-        },
-        {
-            "name":"Chicken Biryani",
-            "description": "Frangrant rice cooked with marinated chicken and spices",
-            "price":250.00
-        }
-    ]
 
-    return Response(menu)
+# Below code is for testing. 
+# # API endpoint for restaurant menu.
+# # GET is used to return menu as API.
+# @api_view(['GET']) 
+# def get_menu(request):
+#     menu = [
+#         {
+#             "name":"Paneer Butter Masala",
+#             "description": "Cottage cheese in a rich tomato-based gravy",
+#             "price":220.00 
+#         },
+#         {
+#             "name":"Chicken Biryani",
+#             "description": "Frangrant rice cooked with marinated chicken and spices",
+#             "price":250.00
+#         }
+#     ]
+
+#     return Response(menu)
+
