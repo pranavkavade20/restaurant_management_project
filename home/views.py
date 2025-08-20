@@ -1,18 +1,28 @@
-from django.shortcuts import render
-import requests
-from django.conf import settings
 # from django.db import DatabaseError # Import DatabaseError from Django
+# import requests
+
+from django.shortcuts import render
+from django.conf import settings
 from datatime import datetime # Import current datetime.
 from products.models import MenuItem
-
+from .forms import *
+from django.contrib import messages
 
 # Display Restaurant name
 def homepage_view(request):
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("home") # Render to homepage.
+    else:
+        form = ContactForm()
     # Fetch name from settings.py in that already define.
    context ={
     'restaurant_name' : settings.RESTAURANT_NAME,
     'restaurant_phone': settings.RESTAURANT_PHONE,
-    'year' : datetime.now().year
+    'year' : datetime.now().year,
+    'form' : form, # pass form to template
    }
    return render(request,'home/home.html',context)
 
