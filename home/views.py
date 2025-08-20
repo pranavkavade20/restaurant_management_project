@@ -15,6 +15,7 @@ def homepage_view(request):
     'year' : datetime.now().year
    }
    return render(request,'home/home.html',context)
+
 # Below view is for testing.
 # # View for fetching API Response.
 # def menu_view(request):
@@ -33,7 +34,7 @@ def homepage_view(request):
 #     # Render data to frontend.
 #     return render(request, 'home/menu.html',{'menu':menu_data})
 
-# View for fetching Menu Items
+# Newly created View for fetching Menu Items
 def menu_view(request):
     menu_items = MenuItem.objects.all()
     return render(request,"home/menu.html", {"menu":menu_items})
