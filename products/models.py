@@ -9,7 +9,7 @@ class Item(models.Model):
     def __str__(self):
         return str(self.item_name)
 
-# Menu models to store menu.
+# Newly created Menu models to store menu.
 class MenuItem(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
