@@ -1,8 +1,11 @@
 from django.shortcuts import render
 import requests
 from django.conf import settings
-from django.db import DatabaseError # Import DatabaseError from Django
+# from django.db import DatabaseError # Import DatabaseError from Django
 from datatime import datetime # Import current datetime.
+from products.models import MenuItem
+
+
 # Display Restaurant name
 def homepage_view(request):
     # Fetch name from settings.py in that already define.
@@ -12,23 +15,28 @@ def homepage_view(request):
     'year' : datetime.now().year
    }
    return render(request,'home/home.html',context)
-
-# View for fetching API Response.
-def menu_view(request):
-    try:
-        # Getting Response throught a URL.
-        response = requests.get('http://localhost:8000/api/products/menu/')
-        # Saving response in JSON format.
-        menu_data = response.json()
-    except DatabaseError:
-        # If there's a database error, return empty data
-        menu_data=[]
-    except Exception:
-        # Catching any other unexpected errors.
-        menu_data=[]
+# Below view is for testing.
+# # View for fetching API Response.
+# def menu_view(request):
+#     try:
+#         # Getting Response throught a URL.
+#         response = requests.get('http://localhost:8000/api/products/menu/')
+#         # Saving response in JSON format.
+#         menu_data = response.json()
+#     except DatabaseError:
+#         # If there's a database error, return empty data
+#         menu_data=[]
+#     except Exception:
+#         # Catching any other unexpected errors.
+#         menu_data=[]
         
-    # Render data to frontend.
-    return render(request, 'home/menu.html',{'menu':menu_data})
+#     # Render data to frontend.
+#     return render(request, 'home/menu.html',{'menu':menu_data})
+
+# View for fetching Menu Items
+def menu_view(request):
+    menu_items = MenuItem.objects.all()
+    return render(request,"home/menu.html", {"menu":menu_items})
 
 # 404 page
 def trigger_404(request):
