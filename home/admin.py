@@ -7,5 +7,6 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_display = ("id","created_at")
     ordering = ("-created_at",)
     readonly_fields = ("created_at",)
+
 # Contact model is registered.
 admin.site.register(Contact)
