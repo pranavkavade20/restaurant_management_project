@@ -98,4 +98,19 @@ Welcome to {{ restaurant_name }}
         </div>
     </div>
 </section>
+
+<!--Detailed Address Section-->
+<section class="py-12 bg-white">
+    <div class="max-w-6xl max-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-[#e23744]">🏠 Visit Us</h2>
+        {% if location %}
+            <div class="mt-4 text-lg text-gray-700">
+                <p>{{ location.address }}</p>
+                <p>{{ location.city }}, {{ location.state }}</p>
+                <p>{{ location.zip_code }}</p>
+            </div>
+        {% else %}
+        <p class="mt-4 text-gray-500">Address details are not available right now...!</p>
+        {% endif %}
+    </div>
 {% endblock %}
