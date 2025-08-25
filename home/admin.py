@@ -10,3 +10,5 @@ class FeedbackAdmin(admin.ModelAdmin):
 
 # Contact model is registered.
 admin.site.register(Contact)
+# Address model is registered.
+admin.site.register(Address)
