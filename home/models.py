@@ -15,10 +15,11 @@ class Feedback(models.Model):
 class Contact(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(blank=True)
+    submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.email})"
 
 # Restaurant Address model.
 class Address(models.Model):
