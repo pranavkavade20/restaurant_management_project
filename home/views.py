@@ -58,8 +58,15 @@ def about_view(request):
     return render(request,'about.html')
 
 # Contact page
-def contact_us(request):
-    return render(request,'contact.html')
+def contact(request):
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save() # Save submission to DB
+            return redirect(contact) # Redirect to avoid resubmission
+    else:
+        form = ContactForm()
+    return render(request,'contact.html',{"form": form, "restaurant_name": "Swaadify"})
 
 # Reservation page
 def reservations(request):
