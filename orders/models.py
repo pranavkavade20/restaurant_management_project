@@ -42,5 +42,4 @@ class OrderItem(models.Model):
     
     def get_item_total(self): 
         # Returns total price of menu_item with help of quantity.
-
         return self.menu_item.price * self.quantity

@@ -9,12 +9,16 @@ class Item(models.Model):
     def __str__(self):
         return str(self.item_name)
 
-# Menu models to store menu.
+# Menu model
 class MenuItem(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=8,decimal_places=2) # Save Price in decimal places 2.
-    image = models.ImageField(upload_to="menu_images/",blank=True,null=True) # Image upload on local storage.
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    image = models.ImageField(upload_to="menu_images/", blank=True, null=True)  
+    # only uploads
 
     def __str__(self):
         return f"{self.name} --> {self.price}"
+
+
+    

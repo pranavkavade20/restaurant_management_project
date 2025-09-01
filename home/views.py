@@ -1,12 +1,9 @@
-# from django.db import DatabaseError # Import DatabaseError from Django
-# import requests
-
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.conf import settings
-from datatime import datetime # Import current datetime.
-from products.models import MenuItem
-from .forms import *
+from datetime import datetime
 from django.contrib import messages
+from .forms import FeedbackForm, ContactForm,Address
+from products.models import MenuItem
 
 # Display Restaurant name
 def homepage_view(request):
@@ -14,86 +11,80 @@ def homepage_view(request):
         form = ContactForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("home") # Render to homepage.
+            return redirect("home")  # replace with your url name for homepage
     else:
         form = ContactForm()
-   
-   # Get the latest location.
-   location = Address.objects.last()
-    # Fetch name from settings.py in that already define.
-    context ={
-        'restaurant_name' : settings.RESTAURANT_NAME,
+    # Get the latest location (you can also use .all() if multiple locations)
+    location = Address.objects.last()
+    context = {
+        'restaurant_name': settings.RESTAURANT_NAME,
         'restaurant_phone': settings.RESTAURANT_PHONE,
-        'year' : datetime.now().year,
-        'form' : form, # pass form to template
-        'location': location # Display latest address.
+        'year': datetime.now().year,
+        'form': form,  # pass form to template
+        'location': location
     }
-   return render(request,'home/home.html',context)
+    return render(request, 'home/home.html', context)
 
-# Below view is for testing.
-# # View for fetching API Response.
+# from django.db import DatabaseError  # Import DatabaseError from Django
+# # View for fetching API Response (with DB error handling)
 # def menu_view(request):
 #     try:
-#         # Getting Response throught a URL.
+#         # Getting Response through a URL
 #         response = requests.get('http://localhost:8000/api/products/menu/')
-#         # Saving response in JSON format.
 #         menu_data = response.json()
 #     except DatabaseError:
 #         # If there's a database error, return empty data
-#         menu_data=[]
+#         menu_data = []
 #     except Exception:
-#         # Catching any other unexpected errors.
-#         menu_data=[]
-        
-#     # Render data to frontend.
-#     return render(request, 'home/menu.html',{'menu':menu_data})
+#         # Catch any other unexpected errors
+#         menu_data = []
 
-# Newly created View for fetching Menu Items
+#     # Render data to frontend
+#     return render(request, 'home/menu.html', {'menu': menu_data})
+
+
 def menu_view(request):
     menu_items = MenuItem.objects.all()
-    return render(request,"home/menu.html", {"menu":menu_items})
+    return render(request, "home/menu.html", {"menu": menu_items})
 
 # 404 page
 def trigger_404(request):
-    return render(request,"404.html", status = 404)
+    return render(request, "404.html", status=404)
 
 # About page
 def about_view(request):
-    return render(request,'about.html')
+    return render(request, 'about.html')
 
-# Contact page
 def contact(request):
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
-            form.save() # Save submission to DB
-            return redirect(contact) # Redirect to avoid resubmission
+            form.save()  # Save submission to DB
+            return redirect("contact")  # Redirect to avoid resubmission
     else:
         form = ContactForm()
-    return render(request,'contact.html',{"form": form, "restaurant_name": "Swaadify"})
+
+    return render(request, "contact.html", {"form": form, "restaurant_name": "Swaadify"})
+
 
 # Reservation page
 def reservations(request):
-    # Fetch name from settings.py in that already define.
-    context ={
-    'restaurant_name' : settings.RESTAURANT_NAME,
-    'restaurant_phone': settings.RESTAURANT_PHONE
+    context = {
+        'restaurant_name': settings.RESTAURANT_NAME,
+        'restaurant_phone': settings.RESTAURANT_PHONE
     }
-    return render(request,"home/reservations.html",context)
+    return render(request, "home/reservations.html", context)
 
 # Feedback page
 def feedback_view(request):
-    # Check the request is POST or not.
-    if request.method =="POST":
-        # Fetching form.
+    if request.method == "POST":
         form = FeedbackForm(request.POST)
-        # Checking the form is valid.
         if form.is_valid():
-            form.save() # Saving data of form.
-            # Showing success message for user.
-            messages.success(request,"Thanks for your feedback! ❤️")
-            return redirect("feedback") # back to the same page clean
+            form.save()
+            messages.success(request, "Thanks for your feedback! ❤️")
+            return redirect("feedback")  # back to the same page clean
     else:
-    # Else the method is not POST then give empty form to user.
         form = FeedbackForm()
-    return render(request,"home/feedback.html",{"form":form})
+
+    return render(request, "home/feedback.html", {"form": form})
+

@@ -2,31 +2,32 @@
 {% load static %}
 
 {% block title %}
-    Reservations -{{restaurant_name}}
+Reservations - {{ restaurant_name }}
 {% endblock %}
 
 {% block content %}
+<section class="min-h-screen flex flex-col items-center 
+justify-center bg-gradient-to-br from-[#fff5f0] to-[#ffece3] px-6 py-16">
+  
+  <!-- Title -->
+  <h1 class="text-4xl md:text-5xl font-extrabold text-[#e23744] mb-6">
+    Table Reservations
+  </h1>
+  
+  <!-- Placeholder Box -->
+  <div class="bg-white shadow-lg rounded-2xl p-8 max-w-xl w-full 
+  text-center">
+    <p class="text-gray-700 text-lg mb-4">
+      Our online reservation system is coming soon! 🍽  
+      For now, please call us to book your table.
+    </p>
+    <p class="text-[#ff914d] font-semibold text-xl">
+      📞 {{ restaurant_phone }}
+    </p>
+  </div>
 
-<section class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#fff5f0] to-[#ffece3] px-6 p-y16">
-    
-    <!--Title-->
-    <h1 class="text-4xl md:text-5xl font-extrabold text-[#e23744] mb-6">
-        Table Reservations
-    </h1>
-    
-    <!--Placeholder Box -->
-    <div class="bg-white shadow-lg rounded-2xl p-8 max-w-xl w-full text-center">
-        <p class="text-gray-700 text-lg mb-4">
-            Our online Reservations system is comming soon...!👳‍♂️
-            For now, Please call us to book your table. 
-        </p>
-        <p class="text-[#ff914d] font-semibold text-xl">
-            📞{{ restaurant_phone}}
-        </p>
-    </div>
-
-    <!-- Decoration Image -->
-    <img src="{% static 'images/logo.png'%}" alt="Swaadify" class="mt-10 w-12 opacity-80">
+  <!-- Decorative Image -->
+  <img src="{% static 'images/logo.png' %}" alt="Swaadify" 
+  class="mt-10 w-12 opacity-80">
 </section>
-
 {% endblock %}

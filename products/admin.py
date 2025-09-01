@@ -6,9 +6,10 @@ from .models import *
 class ItemAdmin(admin.ModelAdmin):
     list_display = ['item_name','item_price','created_at']
 
+
+# Register your models here.
 admin.site.register(Item,ItemAdmin)
 
-# Menu model registeration.
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):
-    list_display = ("name","price")
+    list_display = ("name", "price")
