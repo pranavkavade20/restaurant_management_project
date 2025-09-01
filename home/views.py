@@ -4,7 +4,7 @@ from datetime import datetime
 from django.contrib import messages
 from .forms import FeedbackForm, ContactForm,Address
 from products.models import MenuItem
-
+from django.core.mail import send_mail
 # from django.db import DatabaseError  # Import DatabaseError from Django
 # # View for fetching API Response (with DB error handling)
 # def menu_view(request):
