@@ -62,7 +62,10 @@ def trigger_404(request):
 def about_view(request):
     return render(request,'about.html')
 
-# Contact page
+"""
+This contact page and email now is show on terminal.
+But in production we replace with restaurant email.
+"""
 def contact(request):
     success = False
     if request.method == "POST":
