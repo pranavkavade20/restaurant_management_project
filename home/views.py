@@ -17,13 +17,17 @@ def homepage_view(request):
             return redirect("home") # Render to homepage.
     else:
         form = ContactForm()
+   
+   # Get the latest location.
+   location = Address.objects.last()
     # Fetch name from settings.py in that already define.
-   context ={
-    'restaurant_name' : settings.RESTAURANT_NAME,
-    'restaurant_phone': settings.RESTAURANT_PHONE,
-    'year' : datetime.now().year,
-    'form' : form, # pass form to template
-   }
+    context ={
+        'restaurant_name' : settings.RESTAURANT_NAME,
+        'restaurant_phone': settings.RESTAURANT_PHONE,
+        'year' : datetime.now().year,
+        'form' : form, # pass form to template
+        'location': location # Display latest address.
+    }
    return render(request,'home/home.html',context)
 
 # Below view is for testing.
