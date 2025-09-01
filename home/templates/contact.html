@@ -52,6 +52,12 @@ Contact Us - {{ restaurant_name }}
           {% if form.email.errors %}
             <p class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</p>
           {% endif %}
+          {% if success %}
+            <div class="mb-6 p-4 rounded-lg bg-green-100 text-green-800 border border-green-300">
+              ✅ Thank you! Your message has been sent successfully.
+            </div>
+          {% endif %}
+
         </div>
         <!-- Message -->
         <div>

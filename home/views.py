@@ -5,6 +5,23 @@ from django.contrib import messages
 from .forms import FeedbackForm, ContactForm,Address
 from products.models import MenuItem
 
+# from django.db import DatabaseError  # Import DatabaseError from Django
+# # View for fetching API Response (with DB error handling)
+# def menu_view(request):
+#     try:
+#         # Getting Response through a URL
+#         response = requests.get('http://localhost:8000/api/products/menu/')
+#         menu_data = response.json()
+#     except DatabaseError:
+#         # If there's a database error, return empty data
+#         menu_data = []
+#     except Exception:
+#         # Catch any other unexpected errors
+#         menu_data = []
+
+#     # Render data to frontend
+#     return render(request, 'home/menu.html', {'menu': menu_data})
+
 # Display Restaurant name
 def homepage_view(request):
     if request.method == "POST":
@@ -25,24 +42,6 @@ def homepage_view(request):
     }
     return render(request, 'home/home.html', context)
 
-# from django.db import DatabaseError  # Import DatabaseError from Django
-# # View for fetching API Response (with DB error handling)
-# def menu_view(request):
-#     try:
-#         # Getting Response through a URL
-#         response = requests.get('http://localhost:8000/api/products/menu/')
-#         menu_data = response.json()
-#     except DatabaseError:
-#         # If there's a database error, return empty data
-#         menu_data = []
-#     except Exception:
-#         # Catch any other unexpected errors
-#         menu_data = []
-
-#     # Render data to frontend
-#     return render(request, 'home/menu.html', {'menu': menu_data})
-
-
 def menu_view(request):
     menu_items = MenuItem.objects.all()
     return render(request, "home/menu.html", {"menu": menu_items})
@@ -56,15 +55,42 @@ def about_view(request):
     return render(request, 'about.html')
 
 def contact(request):
+    success = False
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
-            form.save()  # Save submission to DB
-            return redirect("contact")  # Redirect to avoid resubmission
+            contact = form.save()  # store in DB too
+
+            # Send email notification
+            subject = f"📩 New Contact Message from {contact.name}"
+            message = f"""
+You have received a new contact form submission.
+
+Name: {contact.name}
+Email: {contact.email}
+Message:
+{contact.message}
+
+-- Swaadify Contact Form
+"""
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.RESTAURANT_EMAIL],
+                fail_silently=False,
+            )
+
+            success = True
+            return redirect("contact")  # redirect to clear form
     else:
         form = ContactForm()
 
-    return render(request, "contact.html", {"form": form, "restaurant_name": "Swaadify"})
+    return render(request, "contact.html", {
+        "form": form,
+        "restaurant_name": "Swaadify",
+        "success": success
+    })
 
 
 # Reservation page

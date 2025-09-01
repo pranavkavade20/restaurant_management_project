@@ -135,3 +135,17 @@ RESTAURANT_NAME = "Swaadify"
 RESTAURANT_PHONE = "+91 12345 67890"
 
 ALLOWED_HOSTS = ['*']  # Or your actual host/domain
+
+# Development email backend
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# For production (e.g. Gmail SMTP), configure like:
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = "your-email@gmail.com"
+# EMAIL_HOST_PASSWORD = "your-app-password"
+
+DEFAULT_FROM_EMAIL = "noreply@swaadify.in"
+RESTAURANT_EMAIL = "contact@swaadify.in"   # where notifications go
