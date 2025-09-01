@@ -138,3 +138,9 @@ RESTAURANT_NAME="Swaadify"
 RESTAURANT_PHONE="+91 1234567890"
 
 ALLOWED_HOSTS =['*']
+
+# For Development email backend 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEFAULT_FROM_EMAIL = "noreply@swaadify.in"
+RESTAURANT_EMAIL = "contact@swaadify.in" # where nofifications go
