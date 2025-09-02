@@ -57,8 +57,6 @@ Welcome to {{ restaurant_name }}
           </button>
         </form>
       </div>
-
-
       <!-- Decorative icons -->
       <img src="{% static 'images/tomato.png' %}" class="absolute bottom-4 left-4 w-10" alt="">
       <img src="{% static 'images/leaf_logo.png' %}" class="absolute top-6 left-6 w-8" alt="">
@@ -86,6 +84,7 @@ Welcome to {{ restaurant_name }}
   </div>
 </section>
 
+<!-- Search Menu -->
 <section class="bg-gray-100 py-12 px-4 flex justify-center">
   <div class="max-w-6xl w-full p-8 rounded-3xl shadow-xl bg-white">
     <h3 class="text-3xl font-bold text-[#e23744] mb-6 text-center">🔍 Find Your Dish</h3>
@@ -127,6 +126,7 @@ Welcome to {{ restaurant_name }}
     {% endif %}
   </div>
 </section>
+
 <!-- 📍 Location Section -->
 <section class="py-12 bg-gray-50">
   <div class="max-w-6xl mx-auto px-4 text-center">
@@ -154,7 +154,6 @@ Welcome to {{ restaurant_name }}
 <section class="py-12 bg-gray-100">
   <div class="max-w-6xl mx-auto px-4 text-center">
     <h2 class="text-3xl font-bold text-[#e23744]">🕒 Opening Hours</h2>
-
     {% if restaurant.opening_hours %}
       <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl 
       mx-auto text-lg">
