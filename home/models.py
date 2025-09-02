@@ -32,3 +32,16 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.address},{self.city}, {self.state} {self.zip_code}"
+
+# Restaurant model
+class Restaurant(models.Model):
+    name = models.CharField(max_length=200)
+    phone = models.CharField(max_length=15)
+    address = models.OneToOneField("Address", on_delete=models.CASCADE,null=True, blank=True)
+    contact = models.OneToOneField("contact", on_delete=models.CASCADE,null=True, blank=True)
+    # Dictionary like 
+    opening_hours = models.JSONField(default=dict,blank=True)
+
+    def __str__(self):
+        return self.name
+    
