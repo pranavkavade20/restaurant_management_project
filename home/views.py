@@ -29,6 +29,7 @@ from .forms import *
 
 # Display Restaurant name
 def homepage_view(request):
+    # Contact form on homepage
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -36,29 +37,22 @@ def homepage_view(request):
             return redirect("home") # Render to homepage.
     else:
         form = ContactForm()
-   
-#    # Get the latest location.
-#    location = Address.objects.last()
-#     # Fetch name from settings.py in that already define.
-#     context ={
-#         'restaurant_name' : settings.RESTAURANT_NAME,
-#         'restaurant_phone': settings.RESTAURANT_PHONE,
-#         'year' : datetime.now().year,
-#         'form' : form, # pass form to template
-#         'location': location # Display latest address.
-#     }
-#    return render(request,'home/home.html',context)
+    # Search code
+    query = request.GET.get("q","")
+    menu_items = MenuItem.objects.all()
 
-    # Updated above code using model to fetch address from backend.
-    restaurant = Restaurant.objects.first()
-    return render(request,"home/home.html",{
+    if query:
+        menu_items = menu_items.filter(name_icontains=query) #case-insernsitive search 
+    restaurant = Restaurant.objects.first() # Assuming single restaurant data
+    context = {
+        "restaurant_name": restaurant.name if restaurant else "Our Restaurant",
+        "restaurant_phone": restaurant.phone if restaurant else "+91 0000000000",
+        "restaurant_address": restaurant.address if restaurant else "Address not available",
         "restaurant": restaurant,
-        "restaurant_name": restaurant.name,
-        "restaurant_phone": restaurant.phone,
-        "restaurant_address": restaurant.address,
-        "location": restaurant.address
-
-    })
+        "menu_items": menu_items,
+        "query":query
+    }
+    return render(request,"home/home.html", context)
 
 # Newly created View for fetching Menu Items
 def menu_view(request):
