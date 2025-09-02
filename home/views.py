@@ -37,17 +37,28 @@ def homepage_view(request):
     else:
         form = ContactForm()
    
-   # Get the latest location.
-   location = Address.objects.last()
-    # Fetch name from settings.py in that already define.
-    context ={
-        'restaurant_name' : settings.RESTAURANT_NAME,
-        'restaurant_phone': settings.RESTAURANT_PHONE,
-        'year' : datetime.now().year,
-        'form' : form, # pass form to template
-        'location': location # Display latest address.
-    }
-   return render(request,'home/home.html',context)
+#    # Get the latest location.
+#    location = Address.objects.last()
+#     # Fetch name from settings.py in that already define.
+#     context ={
+#         'restaurant_name' : settings.RESTAURANT_NAME,
+#         'restaurant_phone': settings.RESTAURANT_PHONE,
+#         'year' : datetime.now().year,
+#         'form' : form, # pass form to template
+#         'location': location # Display latest address.
+#     }
+#    return render(request,'home/home.html',context)
+
+    # Updated above code using model to fetch address from backend.
+    restaurant = Restaurant.objects.first()
+    return render(request,"home/home.html",{
+        "restaurant": restaurant,
+        "restaurant_name": restaurant.name,
+        "restaurant_phone": restaurant.phone,
+        "restaurant_address": restaurant.address,
+        "location": restaurant.address
+
+    })
 
 # Newly created View for fetching Menu Items
 def menu_view(request):
