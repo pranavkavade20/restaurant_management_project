@@ -8,166 +8,140 @@ Welcome to {{ restaurant_name }}
 {% block content %}
 <!-- Full Page Container -->
 <section class="min-h-screen flex items-center justify-center px-4 py-12">
-  <div class="bg-white shadow-2xl rounded-3xl overflow-hidden max-w-6xl w-full flex flex-col md:flex-row">
-    <!-- Left Text Content -->
+  <div class="bg-white shadow-2xl rounded-3xl overflow-hidden max-w-6xl w-full flex flex-col md:flex-row">  
+    <!-- Restaurant Information for HomePage -->
     <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative">
-      <h1 class="text-5xl font-extrabold text-[#e23744] leading-tight">
-        Welcome to {{ restaurant_name }}
-      </h1>
-      <h2 class="text-2xl text-[#ff914d] font-bold mt-2">
-       🍎🥦 Good Food 🍛🍊 Good Life
-      </h2>
-      <p class="text-gray-700 mt-4">
-        Experience mouth-watering flavors and fresh, high-quality ingredients prepared with passion.
-        Join us for a meal that’s as nourishing as it is delicious.
-      </p>
-      <a href="{% url 'menu' %}" 
-         class="mt-6 bg-[#e23744] w-1/2 hover:bg-[#ff4f5a] 
-         text-white px-6 py-3 rounded-full text-lg font-semibold 
-         shadow-lg transition-transform transform hover:scale-105">
-        🍽 Check our Menu
-      </a>
-      
-      <p class="mt-4 text-lg font-semibold text-[#ff914d]">
-        📞 Call us on {{ restaurant_phone}}
-      </p>
-      <!-- Contact Us Form -->
-      <div class="mt-8 bg-gray-100 p-6 rounded-2xl shadow-lg w-full max-w-md">
-        <h3 class="text-2xl font-bold text-[#e23744] mb-4">📩 Contact Us</h3>
-        <form method="POST" action="">
-          {% csrf_token %}
-          <div class="mb-4">
-            <input type="text" name="name" placeholder="Your Name" 
-                  value="{{ form.name.value|default_if_none:'' }}"
-                  class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
-                  focus:ring-[#e23744]"
-                  required>
-          </div>
-          <div class="mb-4">
-            <input type="email" name="email" placeholder="Your Email"
-                  value="{{ form.email.value|default_if_none:'' }}"
-                  class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
-                  focus:ring-[#e23744]"
-                  required>
-          </div>
-          <button type="submit" 
-                  class="w-full bg-[#e23744] text-white px-4 py-2 rounded-lg font-semibold 
-                  hover:bg-[#c62837] transition-colors duration-200">
-            Submit
-          </button>
-        </form>
-      </div>
-      <!-- Decorative icons -->
-      <img src="{% static 'images/tomato.png' %}" class="absolute bottom-4 left-4 w-10" alt="">
-      <img src="{% static 'images/leaf_logo.png' %}" class="absolute top-6 left-6 w-8" alt="">
+        <h1 class="text-5xl font-extrabold text-[#e23744] leading-tight">
+            Welcome to {{ restaurant_name }}
+        </h1>
+        <h2 class="text-2xl text-[#ff914d] font-bold mt-2">
+           🍎🥦 Good Food 🍛🍊 Good Life
+        </h2>
+        <p class="text-gray-700 mt-4">
+            Experience mouth-watering flavors and fresh, high-quality ingredients prepared with passion.
+            Join us for a meal that’s as nourishing as it is delicious.
+        </p>
+        <!-- Menu button-->
+        <a href="{% url 'menu' %}" 
+            class="mt-6 bg-[#e23744] w-1/2 hover:bg-[#ff4f5a] text-white px-6 py-3 rounded-full text-lg font-semibold shadow-lg transition-transform transform hover:scale-105">
+            🍽 Check our Menu
+        </a>
+        <!-- Phone number-->
+        <p class="mt-4 text-lg font-semibold text-[#ff914d]">
+            📞 Call us on {{ restaurant_phone}}
+        </p>
+        <!-- Contact us form -->
+        <div class="mt-8 bg-gray-100 p-6 rounded-xl shadow-lg w-full max-w-md">
+            <h3 class="text-2xl font-bold text-[#e23744] mb-4">📩 Contact Us </h3>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <input type="text" name="name" placeholder="Your name"
+                            value="{{ form.name.value|default_if_none:''}}"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e23744] required">
+                </div>
+                <div class="mb-4">
+                    <input type="email" name="email" placeholder="Your email"
+                            value="{{ form.email.value|default_if_none:''}}"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#e23744] required">
+                </div>
+                <button type="submit" class="w-full bg-[#e23744] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#c62837] transition-colors duration-200">
+                    Submit
+                </button> 
+            </form>
+        </div>
+        <!-- Decorative icons -->
+        <img src="{% static 'images/tomato.png' %}" class="absolute bottom-4 left-4 w-10" alt="">
+        <img src="{% static 'images/leaf.png' %}" class="absolute top-6 left-6 w-8" alt="">
     </div>
-
     <!-- Right Image Section -->
     <div class="w-full md:w-1/2 relative bg-white flex items-center justify-center p-6">
-      <div class="rounded-full border-8 border-[#ff914d] overflow-hidden shadow-xl">
-        <img src="{% static 'images/Hero-Section.avif' %}"
-             alt="Healthy Salad" class="w-full h-full object-cover">
-      </div>
-
-      <!-- Social Icons -->
-      <div class="absolute right-6 top-1/3 flex flex-col gap-4">
+        <div class="rounded-full border-8 border-[#ff914d] overflow-hidden shadow-xl">
+        <img src="{% static 'images/Hero-Section.avif' %}" alt="Healthy Salad" class="w-full h-full object-cover">
+        </div>
+        <!-- Social Icons -->
+        <div class="absolute right-6 top-1/3 flex flex-col gap-4">
         <a href="#" class="text-[#e23744] hover:text-[#ff4f5a]"><i class="fab fa-instagram text-xl"></i></a>
         <a href="#" class="text-[#e23744] hover:text-[#ff4f5a]"><i class="fab fa-facebook text-xl"></i></a>
         <a href="#" class="text-[#e23744] hover:text-[#ff4f5a]"><i class="fab fa-twitter text-xl"></i></a>
         <a href="#" class="text-[#e23744] hover:text-[#ff4f5a]"><i class="fab fa-whatsapp text-xl"></i></a>
-      </div>
-
-      <!-- Decorative icons -->
-      <img src="{% static 'images/kiwi.jpg' %}" class="absolute bottom-6 right-6 w-10" alt="">
+        </div>
+        <!-- Decorative icons -->
+        <img src="{% static 'images/kiwi.jpg' %}" class="absolute bottom-6 right-6 w-10" alt="">
     </div>
-
   </div>
 </section>
 
-<!-- Search Menu -->
-<section class="bg-gray-100 py-12 px-4 flex justify-center">
-  <div class="max-w-6xl w-full p-8 rounded-3xl shadow-xl bg-white">
-    <h3 class="text-3xl font-bold text-[#e23744] mb-6 text-center">🔍 Find Your Dish</h3>
-    <form action="{% url 'home' %}" method="get" class="flex w-full max-w-lg mx-auto shadow-lg rounded-full overflow-hidden">
-      <input type="text" name="q" placeholder="Search menu items..."
-             value="{{ query }}"
-             class="flex-grow px-5 py-3 border-none focus:outline-none placeholder-gray-400 text-gray-700">
-      <button type="submit"
-              class="bg-[#e23744] text-white px-6 py-3 flex items-center justify-center font-semibold hover:bg-[#c62837] transition-colors duration-200">
-        Search
-      </button>
-    </form>
-
-    {% if query %}
-      <div class="mt-8 bg-gray-50 p-6 rounded-2xl shadow-inner">
-        <h4 class="text-xl font-bold text-[#e23744] mb-4">
-          🍴 Results for "{{ query }}"
-        </h4>
-        {% if menu_items %}
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% for item in menu_items %}
-              <div class="bg-white rounded-xl shadow-md p-4 flex items-center gap-4">
-                {% if item.image %}
-                  <img src="{{ item.image.url }}" alt="{{ item.name }}"
-                       class="w-16 h-16 object-cover rounded-lg">
-                {% endif %}
-                <div>
-                  <h5 class="text-lg font-semibold text-gray-900">{{ item.name }}</h5>
-                  <p class="text-sm text-gray-600 truncate">{{ item.description }}</p>
-                  <p class="mt-1 text-green-600 font-bold">₹ {{ item.price }}</p>
+<!-- Search  menu-->
+<section class="bg-gray py-12 px-4 flex justify-center">
+    <div class="max-w-6xl w-full p-8 rounded-3xl shadow-xl bg-white">
+        <h3 class="text-3xl font-bold text-[#e23744] mb-6 text-center">Find Your Dish</h3>
+        <form action="{% url 'home' %}" method="get" class="flex w-full max-w-lg mx-auto shadow-lg rounded-full overflow-hidden">
+            <input type="text" name="q" placeholder="Search menu items..." value="{{ query }}" class="flex-grow px-5 py-3 border-none focus:outline-none placeholder-gray-400 text-gray-700">
+            <button type="submit" class="bg-[#e23744] text-white px-6 py-3 flex items-center justify-center font-semibold hover:bg-[#c62837] transition-colors duration-200">Search</button>
+        </form>
+        {% if query %}
+        <div class="mt-8 bg-gray-50 p-6 rounded-2xl shadow-inner">
+            <h4 class="text-xl font-bold text-[#e29744] mb-4">
+            Results for "{{ query }}"
+            </h4>
+            {% if menu_items %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for item in menu_items %}
+                <div class="bg-white rounded-xl shadow-md p-4 flex items-center gap-4">
+                    {% if item.image %}
+                        <img src="{{ item.image.url}}" alt="{{ item.name}}" class="w-16 h-16 object-cover rounded-lg">
+                    {% endif %}
                 </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <p class="text-gray-500">No menu items found for "{{ query }}".</p>
-        {% endif %}
-      </div>
-    {% endif %}
-  </div>
-</section>
-
-<!-- 📍 Location Section -->
-<section class="py-12 bg-gray-50">
-  <div class="max-w-6xl mx-auto px-4 text-center">
-    <h2 class="text-3xl font-bold text-[#e23744]">📍 Our Location</h2>
-    <p class="mt-2 text-lg text-gray-700">
-      {{ restaurant_name }} <br>
-      {{ restaurant_address }} <br>
-    </p>
-    <div class="mt-6 w-full max-w-4xl mx-auto rounded-2xl overflow-hidden 
-    shadow-2xl border-4 border-[#ff914d]">
-      <!-- Replace the src below with your restaurant's map iframe from Google Maps -->
-      <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d61143.223593086346!2d74.46404460000001!3d16.704310350000018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc0e265ba450af7%3A0x671b0ba88c556c2!2sIchalkaranji%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1755675720291!5m2!1sen!2sin" width="600" height="450" 
-            class="w-full h-[400px] md:h-[500px]"
-            style="border:0;"
-            allowfullscreen=""
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade">
-      </iframe>
-    </div>
-  </div>
-</section>
-
-<!-- 🕒 Opening Hours Section -->
-<section class="py-12 bg-gray-100">
-  <div class="max-w-6xl mx-auto px-4 text-center">
-    <h2 class="text-3xl font-bold text-[#e23744]">🕒 Opening Hours</h2>
-    {% if restaurant.opening_hours %}
-      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl 
-      mx-auto text-lg">
-        {% for day, hours in restaurant.opening_hours.items %}
-          <div class="flex justify-between bg-white shadow-md rounded-lg 
-          px-6 py-3 hover:shadow-lg transition">
-            <span class="font-semibold text-gray-800">{{ day }}</span>
-            <span class="text-gray-600">{{ hours }}</span>
-          </div>
+                <h5 class="text-lg font-semibold text-gray-900">{{ item.name }}</h5>
+                <p class="text-sm text-gray truncate">{{ item.description }}</p>
+                <p class="mt-1 text-green-600 font-bold">₹ {{ item.price }}
+            </div>
+        </div>
         {% endfor %}
-      </div>
-    {% else %}
-      <p class="mt-4 text-gray-500">Opening hours not available.</p>
-    {% endif %}
-  </div>
+        </div>
+        {% else %}
+            <p class="text-gray-500"> No menu items found for "{{ query }}".</p>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Location section-->
+<section class="py-12 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-[#e237744]">🔍 Our Location</h2>
+        <p class="mt-2 text-lg text-gray-700">
+            {{restaurant_name}}<br>
+            {{ restaurant_phone}}<br>
+        </p>
+        <div class="mt-6 w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-[#ff914d]">
+            <iframe src ="Your_Restaurant_Location_link_from_map" 
+                    class="w-full h-[400px] md:h[500px]"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </div>
+</section>
+
+<!--Opening Hours Section-->
+<section class="py-12 bg-gray-100">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-[#e23744]">🕒 Opening Hours</h2>
+        {% if restaurant.opening_hours %}
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto text-lg">
+            {% for day, hours in restaurant.opening_hours.items %}
+                <div class="flex justify-between bg-white shadow-md rounded-lg px-6 py-3 hover:shadow-lg transition">
+                    <span class="font-semibold text-gray-800">{{ day }}</span>
+                    <span class="text-gray-600">{{ hours }}</span>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            <p class="mt-4 text-gray-500"> Opening hours not available.</p>
+        {% endif %}
+    </div>
 </section>
 {% endblock %}
