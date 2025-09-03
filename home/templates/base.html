@@ -22,24 +22,24 @@
   <nav class="bg-[#E23744] shadow-md"> 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
-        <!-- Logo of restaurant-->
-         <div class="flex items-center space-x-3">
-            <a href="{% url 'home' %}">
+           <!-- Logo + Brand Name -->
+            <div class="flex items-center space-x-3">
+              <a href="{% url 'home' %}">
                 <img src="{% static 'images/logo.png' %}" alt="Swaadify Logo" class="h-10 w-10 rounded-full shadow-lg">
-            </a>
-            <a href="{% url 'home' %}" class="text-2xl font-bold text-white hover:text-gray-100">
-               Swaadify
-            </a>
-         </div>
-        <!-- Links for Navigartion-->
-        <div class="hidden md:flex space-x-6">
-          <a href="{% url 'home' %}" class="text-white hover:text-orange-200 font-medium">Home</a>
-          <a href="{% url 'menu' %}" class="text-white hover:text-orange-200 font-medium">Menu</a>
-          <a href="{% url 'reservations' %}" class="text-white hover:text-orange-200 font-medium">Reservations</a>
-          <a href="{% url 'about' %}" class="text-white hover:text-orange-200 font-medium">About</a>
-          <a href="{% url 'contact' %}" class="text-white hover:text-orange-200 font-medium">Contact</a>
-          <a href="{% url 'feedback' %}" class="text-white hover:text-orange-200 font-medium">feedback</a>
-        </div>
+              </a>
+              <a href="{% url 'home' %}" class="text-2xl font-bold text-white hover:text-gray-100">
+                Swaadify
+              </a>
+            </div>
+            <!-- Links -->
+            <div class="hidden md:flex space-x-6">
+              <a href="{% url 'home' %}" class="text-white hover:text-orange-200 font-medium">Home</a>
+              <a href="{% url 'menu' %}" class="text-white hover:text-orange-200 font-medium">Menu</a>
+              <a href="{% url 'reservations' %}" class="text-white hover:text-orange-200 font-medium">Reservations</a>
+              <a href="{% url 'about' %}" class="text-white hover:text-orange-200 font-medium">About</a>
+              <a href="{% url 'contact' %}" class="text-white hover:text-orange-200 font-medium">Contact</a>
+              <a href="{% url 'feedback' %}" class="text-white hover:text-orange-200 font-medium">Feedback</a>
+            </div>
       </div>
     </div>
   </nav>
@@ -55,20 +55,21 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <p class="text-lg font-semibold">{{ restaurant_name }}</p>
       <p class="text-sm text-gray-400 mt-1">Deliciousness jumping into the mouth!</p>
-      
+
       <!-- Opening Hours -->
       <p class="text-sm text-gray-300 mt-2">
-        Mon-Fri: 11am - 9pm  | Sat-Sun: 10am - 10pm
+        Mon-Fri: 11am - 9pm | Sat-Sun: 10am - 10pm
       </p>
-      
-      
+
       <div class="flex justify-center space-x-6 mt-4">
         <a href="#" class="hover:text-orange-400">Privacy Policy</a>
         <a href="#" class="hover:text-orange-400">Terms of Service</a>
         <a href="{% url 'contact' %}" class="hover:text-orange-400">Contact Us</a>
       </div>
-      <p class="text-xs text-gray-500 mt-4">© {{ year }} {{ restaurant_name}}. All Rights Reserved.</p>
+      <p class="text-xs text-gray-500 mt-4">© {{ year }} {{ restaurant_name }}. All Rights Reserved.</p>
     </div>
   </footer>
+
+
 </body>
 </html>

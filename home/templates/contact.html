@@ -21,7 +21,12 @@ Contact Us - {{ restaurant_name }}
       <p class="mb-2"><strong>Email:</strong> contact@Swaadify.in</p>
       <p class="mb-2"><strong>Working Hours:</strong> 10:00 AM - 11:00 PM (Mon-Sun)</p>
     </div>
-
+      <!-- Success Alert -->
+      {% if success %}
+        <div class="mb-6 p-4 rounded-lg bg-green-100 text-green-800 border border-green-300">
+          ✅ Thank you! Your message has been sent successfully.
+        </div>
+      {% endif %}
     <!-- Contact Form -->
     <div class="bg-white border border-gray-200 rounded-xl shadow-lg p-8">
       <h2 class="text-2xl font-bold text-orange-700 mb-6">Send Us a Message</h2>
@@ -51,11 +56,6 @@ Contact Us - {{ restaurant_name }}
                  rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
           {% if form.email.errors %}
             <p class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</p>
-          {% endif %}
-          {% if success %}
-            <div class="mb-6 p-4 rounded-lg bg-green-100 text-green-800 border border-green-300">
-              ✅ Thank you! Your message has been sent successfully.
-            </div>
           {% endif %}
 
         </div>
