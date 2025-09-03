@@ -26,6 +26,14 @@
           <p class="mt-4 text-green-600 font-bold text-lg group-hover:text-green-700">
             ₹ {{ item.price }}
           </p>
+               <!-- Add to Cart Button -->
+          <div class="mt-4">
+            <a href="{% url 'add_to_cart' item.id %}"
+               class="inline-block bg-red-600 text-white px-4 py-2 rounded-lg shadow-md 
+                      hover:bg-red-700 transition duration-300">
+              Add to Cart
+            </a>
+          </div>
 
         </div>
       </div>

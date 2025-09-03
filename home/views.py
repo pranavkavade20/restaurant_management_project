@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.conf import settings
-from datetime import datetime
 from django.contrib import messages
 from django.core.mail import send_mail
 from products.models import MenuItem
@@ -20,10 +19,17 @@ def homepage_view(request):
     # Search code
     query = request.GET.get("q", "")
     menu_items = MenuItem.objects.all()
-
     if query:
         menu_items = menu_items.filter(name__icontains=query)  # case-insensitive search
     restaurant = Restaurant.objects.first()  # Assuming single restaurant data
+    
+    # Initialize cart in session if not already present
+    if 'cart' not in request.session:
+        request.session['cart'] = {}
+
+    # Count total items in the cart
+    cart = request.session['cart']
+    total_items = sum(cart.values())
     context = {
         "restaurant_name": restaurant.name if restaurant else "Our Restaurant",
         "restaurant_phone": restaurant.phone if restaurant else "+91-0000000000",
@@ -31,6 +37,7 @@ def homepage_view(request):
         "restaurant": restaurant,
         "menu_items": menu_items,
         "query": query,
+        'total_items': total_items,
     }
     return render(request, "home/home.html", context)
 
