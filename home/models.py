@@ -9,7 +9,7 @@ class Feedback(models.Model):
         # Show first 40 chars in admin/listing
         return self.comment[:40] or "Feedback"
 
-# Contact us model
+# Contact us model for user.
 class Contact(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -36,7 +36,6 @@ class Restaurant(models.Model):
     name = models.CharField(max_length=200)
     phone = models.CharField(max_length=15)
     address = models.OneToOneField("Address", on_delete=models.CASCADE, null=True, blank=True)
-    contact = models.OneToOneField("Contact", on_delete=models.CASCADE, null=True, blank=True)
 
     # Dictionary like {"Monday": "9 AM - 10 PM", "Tuesday": "Closed", ...}
     opening_hours = models.JSONField(default=dict, blank=True)
