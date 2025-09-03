@@ -9,7 +9,6 @@
     <h1 class="text-3xl font-extrabold text-[#e23744]">We value your feedback</h1>
     <p class="text-gray-600 mt-2">Tell us what you loved or what we can improve.</p>
 
-    <!-- Flash messages -->
     {% if messages %}
       <div class="mt-4 space-y-2">
         {% for message in messages %}
@@ -24,17 +23,19 @@
     <form method="post" class="mt-6 space-y-4" novalidate>
       {% csrf_token %}
 
-      <label class="block text-sm font-semibold text-gray-700">
-        {{ form.comment.label }}</label>
-      {{ form.comment }}
-
-      {% if form.comment.errors %}
-        <p class="text-sm text-red-600">{{ form.comment.errors.0 }}</p>
-      {% endif %}
+      <div>
+        <label for="{{ form.comment.id_for_label }}" class="block text-sm font-semibold text-gray-700">
+          {{ form.comment.label }}
+        </label>
+        {{ form.comment }}
+        {% if form.comment.errors %}
+          <p class="text-sm text-red-600 mt-1">{{ form.comment.errors.0 }}</p>
+        {% endif %}
+      </div>
 
       <button type="submit"
         class="w-full bg-[#e23744] hover:bg-[#ff4f5a] text-white px-6 py-3
-         rounded-2xl font-semibold shadow-lg transition">
+        rounded-2xl font-semibold shadow-lg transition">
         Submit Feedback
       </button>
     </form>
