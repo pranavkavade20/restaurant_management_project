@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from products.models import Item
+from products.models import MenuItem
 
 # Order model that store the orders.
 class Order(models.Model):
@@ -32,7 +32,7 @@ class OrderItem(models.Model):
     # It store order items spcifically related to order model.
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
     # This help to store menu specifically in OrderItem model. This connected to Item model which has menus.
-    menu_item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     # It store quantiy of items.
     quantity = models.PositiveIntegerField(default=1)
 
