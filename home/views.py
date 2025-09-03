@@ -104,4 +104,3 @@ def feedback_view(request):
         form = FeedbackForm()
 
     return render(request, "home/feedback.html", {"form": form})
-
