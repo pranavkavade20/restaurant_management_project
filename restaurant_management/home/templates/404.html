@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Page not found!{% endblock %}
+{% block content %}
+<div class="min-h-[80vh] flex flex-col items-center justify-center text-center px-4">
+    <h1 class="text-8xl font-extrabold text-[#FF4F5A] drop-shadow-lg">404</h1>
+    <p class="text-2xl mt-4 text-gray-800 font-medium">
+        Oops! The page you're looking for isn't on the menu 🍽️
+    </p>
+    <p class="mt-2 text-gray-500">
+        It might have been moved, removed, or is temporarily unavailable.
+    </p>
+    <a href="{% url 'home' %}" 
+       class="mt-6 inline-block bg-gradient-to-r from-[#FF4F5A] to-[#FF7E1B] 
+              text-white font-semibold px-8 py-3 rounded-full shadow-lg 
+              hover:scale-105 hover:shadow-xl transition-transform duration-300">
+        🍔 Back to Home
+    </a>
+</div>
+{% endblock %}
