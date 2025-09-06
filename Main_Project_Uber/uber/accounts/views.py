@@ -1,7 +1,9 @@
 from rest_framework import status, generics
 from rest_framework.response import Response
 from .serializers import RiderRegistrationSerializer, DriverRegistrationSerializer, UserSerializer
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 class RiderRegistrationView(generics.GenericAPIView):
     """API endpoint for Rider registration."""
@@ -20,7 +22,6 @@ class RiderRegistrationView(generics.GenericAPIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class DriverRegistrationView(generics.GenericAPIView):
     """API endpoint for Driver registration."""
 
@@ -38,3 +39,16 @@ class DriverRegistrationView(generics.GenericAPIView):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ProtectedTestView(APIView):
+    """A sample endpoint that requires JWT authentication."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        return Response(
+            {
+                "message": "You are successfully authenticated!",
+                "user": request.user.username,
+            }
+        )
