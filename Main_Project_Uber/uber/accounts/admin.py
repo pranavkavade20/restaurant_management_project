@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Rider, Driver
-
+from .models import Ride, Rider, Driver
 
 @admin.register(Rider)
 class RiderAdmin(admin.ModelAdmin):
@@ -10,7 +9,6 @@ class RiderAdmin(admin.ModelAdmin):
     search_fields = ("user__username", "user__email", "phone_number")
     list_filter = ("preferred_payment_method",)
     ordering = ("id",)
-
 
 @admin.register(Driver)
 class DriverAdmin(admin.ModelAdmin):
@@ -34,3 +32,11 @@ class DriverAdmin(admin.ModelAdmin):
     )
     list_filter = ("availability_status", "vehicle_make")
     ordering = ("id",)
+
+@admin.register(Ride)
+class RideAdmin(admin.ModelAdmin):
+    """Admin settings for Ride model for easier debugging and monitoring."""
+    list_display = ("id", "rider", "driver", "status", "pickup_address", "dropoff_address", "requested_at")
+    list_filter = ("status", "requested_at")
+    search_fields = ("rider__user__username", "driver__user__username", "pickup_address", "dropoff_address")
+    ordering = ("-requested_at",)
