@@ -10,7 +10,6 @@ from django.db import transaction
 from accounts.permissions import IsRider, IsDriver,IsRideRiderOrAssignedDriverOrStaff
 from accounts.models import Driver
 
-
 # Ride app 
 from .models import Ride
 from .serializers import (
@@ -19,7 +18,6 @@ from .serializers import (
             LocationUpdateSerializer, 
             RideTrackSerializer
     ) 
-
 
 class RideRequestCreateView(generics.CreateAPIView):
     """
