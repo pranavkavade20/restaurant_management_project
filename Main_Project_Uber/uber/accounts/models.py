@@ -25,8 +25,8 @@ class Driver(models.Model):
     vehicle_number_plate = models.CharField(max_length=20, blank=True, null=True, unique=True)
     driver_license_number = models.CharField(max_length=30, blank=True, null=True, unique=True)
     availability_status = models.BooleanField(default=False)
-    current_latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
-    current_longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    current_latitude = models.FloatField(null=True, blank=True, help_text="Latest reported latitude from driver device.")
+    current_longitude = models.FloatField(null=True, blank=True, help_text="Latest reported longitude from driver device.")
     profile_photo = models.ImageField(upload_to="driver_profiles/", blank=True, null=True)
 
     def __str__(self):

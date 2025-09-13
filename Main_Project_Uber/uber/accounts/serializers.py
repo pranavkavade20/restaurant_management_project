@@ -211,3 +211,34 @@ class RideSerializer(serializers.ModelSerializer):
 
     def get_driver_username(self, obj):
         return obj.driver.user.username if obj.driver and obj.driver.user else None
+
+class LocationUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for driver location updates.
+    Expects latitude and longitude (floats) and optionally the ride_id for verification.
+    """
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+    ride_id = serializers.IntegerField(required=False)
+
+    def validate(self, attrs):
+        lat = attrs.get("latitude")
+        lng = attrs.get("longitude")
+
+        # basic bounds validation
+        if not (-90.0 <= lat <= 90.0):
+            raise serializers.ValidationError({"latitude": "Latitude must be between -90 and 90."})
+        if not (-180.0 <= lng <= 180.0):
+            raise serializers.ValidationError({"longitude": "Longitude must be between -180 and 180."})
+        return attrs
+
+
+class RideTrackSerializer(serializers.Serializer):
+    """
+    Minimal serializer returned to riders when tracking a ride.
+    """
+    driver_latitude = serializers.FloatField(allow_null=True)
+    driver_longitude = serializers.FloatField(allow_null=True)
+    status = serializers.CharField()
+    driver_id = serializers.IntegerField(allow_null=True)
+    updated_at = serializers.DateTimeField()
