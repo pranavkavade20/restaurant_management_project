@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 class Rider(models.Model):
-    """Model representing a Rider linked to Django's User."""
+    """Model representing a rider linked to Django's User."""
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="rider_profile")
     phone_number = models.CharField(max_length=15, blank=True, null=True)
@@ -16,7 +16,7 @@ class Rider(models.Model):
 
 
 class Driver(models.Model):
-    """Model representing a Driver linked to Django's User."""
+    """Model representing a driver linked to Django's User."""
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="driver_profile")
     phone_number = models.CharField(max_length=15, blank=True, null=True)
