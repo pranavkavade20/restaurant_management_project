@@ -245,10 +245,6 @@ class CancelRideView(APIView):
         except Ride.DoesNotExist:
             return Response({"error": "Ride not found."}, status=status.HTTP_404_NOT_FOUND)
 
-
-
-
-
 def _get_rider_profile(user):
     """
     Helper: try common attribute names for rider profile.
@@ -256,14 +252,12 @@ def _get_rider_profile(user):
     """
     return getattr(user, "rider_profile", None) or getattr(user, "rider", None)
 
-
 def _get_driver_profile(user):
     """
     Helper: try common attribute names for driver profile.
     Returns the driver profile object or None.
     """
     return getattr(user, "driver_profile", None) or getattr(user, "driver", None)
-
 
 class RiderHistoryView(generics.ListAPIView):
     """
@@ -284,7 +278,6 @@ class RiderHistoryView(generics.ListAPIView):
             rider=rider,
             status__in=[Ride.Status.COMPLETED, Ride.Status.CANCELLED],
         ).order_by("-requested_at")
-
 
 class DriverHistoryView(generics.ListAPIView):
     """
