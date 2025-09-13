@@ -14,7 +14,6 @@ class Rider(models.Model):
     def __str__(self):
         return f"Rider: {self.user.username}"
 
-
 class Driver(models.Model):
     """Model representing a driver linked to Django's User."""
 
