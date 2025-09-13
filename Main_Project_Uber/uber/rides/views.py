@@ -1,7 +1,8 @@
 # Built in modules
-from rest_framework import status, generics
+from rest_framework import status, generics, permissions
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.db import transaction
@@ -16,7 +17,8 @@ from .serializers import (
             RideRequestSerializer, 
             RideSerializer,
             LocationUpdateSerializer, 
-            RideTrackSerializer
+            RideTrackSerializer,
+            RideHistorySerializer
     ) 
 
 class RideRequestCreateView(generics.CreateAPIView):
@@ -242,3 +244,64 @@ class CancelRideView(APIView):
 
         except Ride.DoesNotExist:
             return Response({"error": "Ride not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
+def _get_rider_profile(user):
+    """
+    Helper: try common attribute names for rider profile.
+    Returns the rider profile object or None.
+    """
+    return getattr(user, "rider_profile", None) or getattr(user, "rider", None)
+
+
+def _get_driver_profile(user):
+    """
+    Helper: try common attribute names for driver profile.
+    Returns the driver profile object or None.
+    """
+    return getattr(user, "driver_profile", None) or getattr(user, "driver", None)
+
+
+class RiderHistoryView(generics.ListAPIView):
+    """
+    GET /api/rider/history/
+    Returns completed and cancelled rides for the logged-in rider.
+    Paginated (DRF PageNumberPagination, PAGE_SIZE in settings).
+    """
+    serializer_class = RideHistorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        rider = _get_rider_profile(self.request.user)
+        if rider is None:
+            # Not a rider account
+            raise PermissionDenied(detail="Authenticated user is not a Rider.")
+        # Only COMPLETED or CANCELLED rides for this rider
+        return Ride.objects.filter(
+            rider=rider,
+            status__in=[Ride.Status.COMPLETED, Ride.Status.CANCELLED],
+        ).order_by("-requested_at")
+
+
+class DriverHistoryView(generics.ListAPIView):
+    """
+    GET /api/driver/history/
+    Returns completed and cancelled rides for the logged-in driver.
+    Paginated (DRF PageNumberPagination, PAGE_SIZE in settings).
+    """
+    serializer_class = RideHistorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        driver = _get_driver_profile(self.request.user)
+        if driver is None:
+            # Not a driver account
+            raise PermissionDenied(detail="Authenticated user is not a Driver.")
+        # Only COMPLETED or CANCELLED rides for this driver
+        return Ride.objects.filter(
+            driver=driver,
+            status__in=[Ride.Status.COMPLETED, Ride.Status.CANCELLED],
+        ).order_by("-requested_at")

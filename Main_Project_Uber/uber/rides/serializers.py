@@ -99,3 +99,40 @@ class RideTrackSerializer(serializers.Serializer):
     status = serializers.CharField()
     driver_id = serializers.IntegerField(allow_null=True)
     updated_at = serializers.DateTimeField()
+
+class RideHistorySerializer(serializers.ModelSerializer):
+    """
+    Serializer used for ride history responses.
+    Keeps the payload minimal and front-end friendly.
+    """
+    pickup = serializers.CharField(source="pickup_address", read_only=True)
+    drop = serializers.CharField(source="dropoff_address", read_only=True)
+    driver = serializers.SerializerMethodField()
+    rider = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Ride
+        fields = (
+            "id",
+            "pickup",
+            "drop",
+            "status",
+            "requested_at",
+            "driver",
+            "rider",
+        )
+        read_only_fields = fields
+
+    def get_driver(self, obj):
+        """Return assigned driver's username or null."""
+        driver = getattr(obj, "driver", None)
+        if driver and getattr(driver, "user", None):
+            return driver.user.username
+        return None
+
+    def get_rider(self, obj):
+        """Return rider's username or null (useful for driver history)."""
+        rider = getattr(obj, "rider", None)
+        if rider and getattr(rider, "user", None):
+            return rider.user.username
+        return None
