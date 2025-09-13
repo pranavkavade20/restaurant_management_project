@@ -6,8 +6,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 # Local Modules
-from .serializers import RiderRegistrationSerializer, DriverRegistrationSerializer, UserSerializer,RiderLoginSerializer, DriverLoginSerializer,LogoutSerializer
-
+from .serializers import ( 
+    RiderRegistrationSerializer, 
+    DriverRegistrationSerializer, 
+    UserSerializer,
+    RiderLoginSerializer, 
+    DriverLoginSerializer,
+    LogoutSerializer
+)
 class RiderRegistrationView(generics.GenericAPIView):
     """API endpoint for Rider registration."""
     serializer_class = RiderRegistrationSerializer

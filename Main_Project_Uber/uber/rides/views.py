@@ -7,12 +7,18 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 
 # Accounts app
-from accounts.permissions import IsRider, IsDriver
-from accounts.models import Driver, Ride
+from accounts.permissions import IsRider, IsDriver,IsRideRiderOrAssignedDriverOrStaff
+from accounts.models import Driver
+
 
 # Ride app 
-from .permissions import IsRideRiderOrAssignedDriverOrStaff
-from .serializers import RideRequestSerializer, RideSerializer,LocationUpdateSerializer, RideTrackSerializer
+from .models import Ride
+from .serializers import (
+            RideRequestSerializer, 
+            RideSerializer,
+            LocationUpdateSerializer, 
+            RideTrackSerializer
+    ) 
 
 
 class RideRequestCreateView(generics.CreateAPIView):
@@ -29,7 +35,7 @@ class RideRequestCreateView(generics.CreateAPIView):
         Assumes request.user has rider_profile (OneToOne).
         """
         rider_profile = self.request.user.rider_profile
-        serializer.save(rider=rider_profile, status=Ride.Status.REQUESTED)
+        serializer.save(rider=rider_profile, status= Ride.Status.REQUESTED)
 
 class AvailableRidesListView(generics.ListAPIView):
     """
@@ -196,7 +202,6 @@ class CompleteRideView(APIView):
 
         except Ride.DoesNotExist:
             return Response({"error": "Ride not found."}, status=status.HTTP_404_NOT_FOUND)
-
 
 class CancelRideView(APIView):
     """

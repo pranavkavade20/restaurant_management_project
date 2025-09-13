@@ -1,6 +1,10 @@
 from django.db import models
 from django.utils import timezone
 
+# Explicit imports from accounts app
+from accounts.models import Rider, Driver
+
+
 class Ride(models.Model):
     """
     Represents a ride request in the system.
@@ -13,14 +17,15 @@ class Ride(models.Model):
         COMPLETED = "COMPLETED", "Completed"
         CANCELLED = "CANCELLED", "Cancelled"
 
+    # Foreign keys to accounts app
     rider = models.ForeignKey(
-        "Rider",
+        Rider,
         related_name="rides",
         on_delete=models.CASCADE,
         help_text="Rider who requested the ride.",
     )
     driver = models.ForeignKey(
-        "Driver",
+        Driver,
         related_name="rides",
         null=True,
         blank=True,
@@ -38,6 +43,7 @@ class Ride(models.Model):
     drop_lat = models.DecimalField(max_digits=9, decimal_places=6)
     drop_lng = models.DecimalField(max_digits=9, decimal_places=6)
 
+    # Status of the ride
     status = models.CharField(
         max_length=16,
         choices=Status.choices,
