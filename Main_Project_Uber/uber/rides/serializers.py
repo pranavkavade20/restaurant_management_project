@@ -1,5 +1,10 @@
+# Built in modules.
 from rest_framework import serializers
-from .models import Ride
+from rest_framework.exceptions import ValidationError, PermissionDenied
+from django.utils.translation import gettext_lazy as _
+
+# Local modules.
+from .models import Ride, RideFeedback
 
 class RideSerializer(serializers.ModelSerializer):
     """
@@ -136,3 +141,47 @@ class RideHistorySerializer(serializers.ModelSerializer):
         if rider and getattr(rider, "user", None):
             return rider.user.username
         return None
+
+class RideFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RideFeedback
+        fields = ["id", "ride", "rating", "comment", "is_driver", "submitted_at"]
+        read_only_fields = ["id", "is_driver", "submitted_at", "ride"]
+
+    rating = serializers.IntegerField(min_value=1, max_value=5)
+
+    def validate(self, attrs):
+        request = self.context.get("request")
+        ride = self.context.get("ride")  # Passed from view
+        user = request.user if request else None
+
+        if ride is None:
+            raise ValidationError(_("Ride is required."))
+
+        # 1. Ride must be completed
+        if ride.status != Ride.Status.COMPLETED:
+            raise ValidationError(_("Ride is not completed yet."))
+
+        # 2. User must be part of the ride
+        is_driver = hasattr(user, "driver") or hasattr(user, "driver_profile")
+        is_rider = hasattr(user, "rider") or hasattr(user, "rider_profile")
+
+        if is_driver and ride.driver and ride.driver.user == user:
+            role = True
+        elif is_rider and ride.rider and ride.rider.user == user:
+            role = False
+        else:
+            raise PermissionDenied(_("You are not part of this ride."))
+
+        # 3. Feedback must not already exist
+        if RideFeedback.objects.filter(ride=ride, is_driver=role).exists():
+            raise ValidationError(_("Feedback already submitted."))
+
+        # Save role in serializer context
+        attrs["is_driver"] = role
+        attrs["ride"] = ride
+        attrs["submitted_by"] = user
+        return attrs
+
+    def create(self, validated_data):
+        return RideFeedback.objects.create(**validated_data)
