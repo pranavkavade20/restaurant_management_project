@@ -6,7 +6,8 @@ from .views import (
     CompleteRideView,
     CancelRideView,
     RiderHistoryView, 
-    DriverHistoryView
+    DriverHistoryView,
+    RideFeedbackCreateView
 )
 urlpatterns = [
     path("request/", RideRequestCreateView.as_view(), name="ride-request"),
@@ -16,4 +17,5 @@ urlpatterns = [
     path("cancel/<int:ride_id>/", CancelRideView.as_view(), name="ride-cancel"),
     path("rider/history/", RiderHistoryView.as_view(), name="rider-history"),
     path("driver/history/", DriverHistoryView.as_view(), name="driver-history"),
+    path("feedback/<int:ride_id>/", RideFeedbackCreateView.as_view(), name="ride-feedback"),
 ]

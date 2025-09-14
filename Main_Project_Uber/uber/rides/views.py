@@ -2,7 +2,7 @@
 from rest_framework import status, generics, permissions
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.db import transaction
@@ -12,14 +12,16 @@ from accounts.permissions import IsRider, IsDriver,IsRideRiderOrAssignedDriverOr
 from accounts.models import Driver
 
 # Ride app 
-from .models import Ride
+from .models import Ride, RideFeedback
 from .serializers import (
             RideRequestSerializer, 
             RideSerializer,
             LocationUpdateSerializer, 
             RideTrackSerializer,
-            RideHistorySerializer
+            RideHistorySerializer,
+            RideFeedbackSerializer
     ) 
+
 
 class RideRequestCreateView(generics.CreateAPIView):
     """
@@ -298,3 +300,83 @@ class DriverHistoryView(generics.ListAPIView):
             driver=driver,
             status__in=[Ride.Status.COMPLETED, Ride.Status.CANCELLED],
         ).order_by("-requested_at")
+
+def _get_rider_profile(user):
+    """Helper: tolerant lookup for rider profile attribute names."""
+    return getattr(user, "rider_profile", None) or getattr(user, "rider", None)
+
+
+def _get_driver_profile(user):
+    """Helper: tolerant lookup for driver profile attribute names."""
+    return getattr(user, "driver_profile", None) or getattr(user, "driver", None)
+
+
+class RideFeedbackCreateView(APIView):
+    """
+    POST /api/ride/feedback/<ride_id>/
+    Allows the rider or the assigned driver to submit feedback once the ride is COMPLETED.
+
+    Business rules enforced:
+    - User must be authenticated.
+    - Ride must exist and be COMPLETED.
+    - User must be either the ride.rider or the ride.driver.
+    - The user can submit feedback only once per role (driver/rider).
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, ride_id, *args, **kwargs):
+        # Lock the ride row first to avoid race conditions where two parties submit simultaneously
+        try:
+            with transaction.atomic():
+                ride = Ride.objects.select_for_update().get(pk=ride_id)
+                # 1) Ride must be completed
+                if ride.status != Ride.Status.COMPLETED:
+                    return Response(
+                        {"error": "Ride is not completed yet."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                user = request.user
+                rider_profile = _get_rider_profile(user)
+                driver_profile = _get_driver_profile(user)
+
+                # 2) Determine whether the user is the rider or the assigned driver
+                is_driver = False
+                if driver_profile and ride.driver is not None and ride.driver.pk == driver_profile.pk:
+                    is_driver = True
+                elif rider_profile and ride.rider is not None and ride.rider.pk == rider_profile.pk:
+                    is_driver = False
+                else:
+                    # User is not part of this ride
+                    raise PermissionDenied(detail="You are not part of this ride.")
+
+                # 3) Check feedback existence for this role (prevent duplicates early)
+                if RideFeedback.objects.filter(ride=ride, is_driver=is_driver).exists():
+                    return Response(
+                        {"error": "You have already submitted feedback for this ride."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+                # 4) Validate payload via serializer
+                # Pass ride via context so serializer can validate using ride
+                serializer = RideFeedbackSerializer(
+                    data=request.data, context={"request": request, "ride": ride}
+                )
+                serializer.is_valid(raise_exception=True)
+
+                # Serializer's create uses validated_data (which the serializer populates with ride, is_driver, submitted_by)
+                feedback = serializer.save()
+
+                return Response(
+                    {"message": "Feedback submitted successfully."},
+                    status=status.HTTP_201_CREATED,
+                )
+
+        except Ride.DoesNotExist:
+            return Response({"error": "Ride not found."}, status=status.HTTP_404_NOT_FOUND)
+        except ValidationError as exc:
+            # serializer validation errors or custom validation raising ValidationError
+            return Response(exc.detail, status=status.HTTP_400_BAD_REQUEST)
+        except PermissionDenied as exc:
+            return Response({"error": str(exc.detail)}, status=status.HTTP_403_FORBIDDEN)
