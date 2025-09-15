@@ -42,3 +42,24 @@ class Restaurant(models.Model):
 
     def __str__(self):
         return self.name
+
+# MenuCategoru model
+class MenuCategory(models.Model):
+    """
+    Represents categories for the restaurant's menu 
+    (e.g., Appetizers, Main Courses, Desserts).
+    """
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        db_index=True,  # Improves lookup performance
+        verbose_name="Category Name"
+    )
+
+    class Meta:
+        verbose_name = "Menu Category"
+        verbose_name_plural = "Menu Categories"
+        ordering = ["name"]  # Sort categories alphabetically
+
+    def __str__(self):
+        return self.name

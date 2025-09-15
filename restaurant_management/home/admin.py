@@ -10,3 +10,12 @@ class FeedbackAdmin(admin.ModelAdmin):
 admin.site.register(Contact)
 admin.site.register(Address)
 admin.site.register(Restaurant)
+
+@admin.register(MenuCategory)
+class MenuCategoryAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for MenuCategory model.
+    """
+    list_display = ("id", "name")  # Display ID and Category name in the list
+    search_fields = ("name",)      # Enable search by name
+    ordering = ("name",)           # Order categories alphabetically
