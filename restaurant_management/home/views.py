@@ -1,9 +1,15 @@
+# Built in modules
 from django.shortcuts import render, redirect
 from django.conf import settings
 from django.contrib import messages
 from django.core.mail import send_mail
+from rest_framework.generics import ListAPIView
+
+# Local modules
 from products.models import MenuItem
 from .forms import *
+from .models import MenuCategory
+from .serializers import MenuCategorySerializer
 
 # Display Restaurant name
 def homepage_view(request):
@@ -90,7 +96,6 @@ def contact(request):
         "success": success
     })
 
-
 # Reservation page
 def reservations(request):
     context = {
@@ -111,3 +116,10 @@ def feedback_view(request):
         form = FeedbackForm()
 
     return render(request, "home/feedback.html", {"form": form})
+
+class MenuCategoryListView(ListAPIView):
+    """
+    API endpoint to list all menu categories.
+    """
+    queryset = MenuCategory.objects.all().order_by('name')
+    serializer_class = MenuCategorySerializer
