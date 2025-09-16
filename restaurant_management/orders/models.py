@@ -67,3 +67,23 @@ class CartItem(models.Model):
     @property
     def subtotal(self):
         return self.menu_item.price * self.quantity
+
+class OrderStatus(models.Model):
+    """
+    Represents different statuses of an order 
+    (e.g., Pending, Processing, Completed, Cancelled).
+    """
+    name = models.CharField(
+        max_length=50,
+        unique=True,
+        db_index=True,
+        verbose_name="Order Status"
+    )
+
+    class Meta:
+        verbose_name = "Order Status"
+        verbose_name_plural = "Order Statuses"
+        ordering = ["id"]  # keep consistent creation order
+
+    def __str__(self):
+        return self.name
