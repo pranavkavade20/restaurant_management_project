@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from products.models import MenuItem
 from django.conf import settings 
+from django.utils import timezone
 
 class OrderStatus(models.Model):
     """
@@ -89,4 +90,30 @@ class CartItem(models.Model):
     def subtotal(self):
         return self.menu_item.price * self.quantity
 
+class Coupon(models.Model):
+    """
+    Represents discount coupons used in orders.
+    """
+    code = models.CharField(
+        max_length=15,
+        unique=True,
+        db_index=True,
+        verbose_name="Coupon Code"
+    )
+    discount = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        help_text="Discount value in percentage (e.g., 10.00 for 10%)"
+    )
+    is_active = models.BooleanField(default=True)
+    valid_from = models.DateTimeField(default=timezone.now)
+    valid_to = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Coupon"
+        verbose_name_plural = "Coupons"
+        ordering = ["-valid_from"]
+
+    def __str__(self):
+        return f"{self.code} ({self.discount}% off)"
 
