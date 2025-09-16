@@ -2,6 +2,27 @@ from django.db import models
 from django.contrib.auth.models import User
 from products.models import MenuItem
 from django.conf import settings 
+
+class OrderStatus(models.Model):
+    """
+    Represents different statuses of an order 
+    (e.g., Pending, Processing, Completed, Cancelled).
+    """
+    name = models.CharField(
+        max_length=50,
+        unique=True,
+        db_index=True,
+        verbose_name="Order Status"
+    )
+
+    class Meta:
+        verbose_name = "Order Status"
+        verbose_name_plural = "Order Statuses"
+        ordering = ["id"]  # keep consistent creation order
+
+    def __str__(self):
+        return self.name
+    
 # Order model that store the orders.
 class Order(models.Model):
     # Choices that show status realted to order_status.
@@ -17,7 +38,7 @@ class Order(models.Model):
     # It store decimal field to store total price of menu.
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     # It store status of order.
-    order_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    order_status = models.ForeignKey(OrderStatus, on_delete=models.SET_NULL, null=True,default="PENDING")
     # It store the time at the created of Order.
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -68,22 +89,4 @@ class CartItem(models.Model):
     def subtotal(self):
         return self.menu_item.price * self.quantity
 
-class OrderStatus(models.Model):
-    """
-    Represents different statuses of an order 
-    (e.g., Pending, Processing, Completed, Cancelled).
-    """
-    name = models.CharField(
-        max_length=50,
-        unique=True,
-        db_index=True,
-        verbose_name="Order Status"
-    )
 
-    class Meta:
-        verbose_name = "Order Status"
-        verbose_name_plural = "Order Statuses"
-        ordering = ["id"]  # keep consistent creation order
-
-    def __str__(self):
-        return self.name
