@@ -9,6 +9,7 @@ urlpatterns = [
     path('contact/', contact, name='contact'),
     path('reservations/', reservations, name='reservations'),
     path("feedback/",feedback_view, name="feedback"),
-    path('categories/', MenuCategoryListView.as_view(), name='menu-category-list'),
+    path("categories/", MenuCategoryListView.as_view(), name="menu-category-list"),
+    path("menu-items/", MenuItemViewSet.as_view({"get": "list"}), name="menu-items"),
 
 ]

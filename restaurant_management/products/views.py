@@ -19,7 +19,6 @@ class MenuItemView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 def add_to_cart(request, product_id):
     cart = request.session.get('cart', {})
 

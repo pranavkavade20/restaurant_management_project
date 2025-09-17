@@ -14,8 +14,6 @@ class FeedbackForm(forms.ModelForm):
         }
         labels = {"comment": "Your Feedback"}
 
-
-
 class ContactForm(forms.ModelForm):
     class Meta:
         model = Contact

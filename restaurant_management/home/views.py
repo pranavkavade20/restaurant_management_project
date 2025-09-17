@@ -4,13 +4,14 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.mail import send_mail
 from rest_framework.generics import ListAPIView
+from rest_framework import viewsets, filters
+from rest_framework.pagination import PageNumberPagination
 
 # Local modules
 from products.models import MenuItem
 from .forms import *
 from .models import MenuCategory
-from .serializers import MenuCategorySerializer
-
+from .serializers import MenuCategorySerializer,MenuItemSerializer
 # Display Restaurant name
 def homepage_view(request):
     # Contact form on homepage
@@ -123,3 +124,19 @@ class MenuCategoryListView(ListAPIView):
     """
     queryset = MenuCategory.objects.all().order_by('name')
     serializer_class = MenuCategorySerializer
+
+class MenuItemPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
+class MenuItemViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to list and search menu items by name.
+    """
+    queryset = MenuItem.objects.all().order_by("name")
+    serializer_class = MenuItemSerializer
+    pagination_class = MenuItemPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name"]
