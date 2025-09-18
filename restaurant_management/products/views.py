@@ -1,9 +1,11 @@
+from django.shortcuts import redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status,permissions
+from django.shortcuts import get_object_or_404
 from .models import MenuItem
 from .serializers import MenuItemSerializer
-from django.shortcuts import redirect
+
 # Create your views here.
 class MenuItemView(APIView):
     def get(self, request):
@@ -50,3 +52,21 @@ class MenuItemsByCategoryAPIView(APIView):
         serializer = MenuItemSerializer(menu_items, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class UpdateMenuItemAPIView(APIView):
+    """
+    API endpoint to update an existing menu item.
+    Only admins/staff should be allowed.
+    """
+
+    permission_classes = [permissions.IsAdminUser]  # Restrict to admins
+
+    def put(self, request, pk, *args, **kwargs):
+        menu_item = get_object_or_404(MenuItem, pk=pk)
+        serializer = MenuItemSerializer(menu_item, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
