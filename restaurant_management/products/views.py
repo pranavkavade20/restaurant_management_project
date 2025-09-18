@@ -30,3 +30,23 @@ def add_to_cart(request, product_id):
     request.session.modified = True
 
     return redirect('home')  # Redirect to homepage or cart page
+
+class MenuItemsByCategoryAPIView(APIView):
+    """
+    API endpoint to filter menu items by category.
+    Example: /api/menu-items/by-category/?category=Pizza
+    """
+
+    def get(self, request, *args, **kwargs):
+        category_name = request.query_params.get("category")
+
+        if not category_name:
+            return Response(
+                {"error": "Category parameter is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        menu_items = MenuItem.objects.filter(category__name__iexact=category_name)
+        serializer = MenuItemSerializer(menu_items, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
