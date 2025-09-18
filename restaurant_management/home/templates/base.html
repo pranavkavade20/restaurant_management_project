@@ -77,22 +77,40 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center space-x-3">
-                    <a href="{% url 'home' %}">
-                        <img src="{% static 'images/logo_main.png' %}" alt="Swaadify Logo" class="h-12 w-12 rounded-full">
-                    </a>
-                    <a href="{% url 'home' %}" class="text-3xl font-extrabold text-[#E23744] hover:text-[#FF6B6B] transition-colors duration-300">
-                        Swaadify
+                    <a href="{% url 'home' %}" class="flex items-center space-x-2">
+                        <img src="{% static 'images/logo_main.png' %}" alt="Swaadify Logo" class="h-12 w-12 rounded-full transform transition-transform duration-300 hover:scale-110">
+                        <span class="text-3xl font-extrabold text-[#E23744]">Swaadify</span>
                     </a>
                 </div>
+
                 <nav class="hidden md:flex items-center space-x-8">
-                    <a href="{% url 'home' %}" class="text-gray-700 hover:text-[#E23744] font-semibold nav-link">Home</a>
-                    <a href="{% url 'menu' %}" class="text-gray-700 hover:text-[#E23744] font-semibold nav-link">Menu</a>
-                    <a href="{% url 'reservations' %}" class="text-gray-700 hover:text-[#E23744] font-semibold nav-link">Reservations</a>
-                    <a href="{% url 'about' %}" class="text-gray-700 hover:text-[#E23744] font-semibold nav-link">About</a>
-                    <a href="{% url 'contact' %}" class="text-gray-700 hover:text-[#E23744] font-semibold nav-link">Contact</a>
-                    <a href="{% url 'feedback' %}" class="text-white bg-[#E23744] hover:bg-[#FF6B6B] px-5 py-2 rounded-full font-semibold transition-colors duration-300 transform hover:scale-105">Feedback</a>
-                    <a href="{% url 'cart' %}" class="text-white bg-[#E23744] hover:bg-[#FF6B6B] px-5 py-2 rounded-full font-semibold transition-colors duration-300 transform hover:scale-105"><i class="fi fi-rr-shopping-cart"></i> Cart ({{ cart_item_count }})</a>
+                    <a href="{% url 'home' %}" class="text-gray-700 hover:text-[#E23744] font-semibold transition duration-300">Home</a>
+                    <a href="{% url 'menu' %}" class="text-gray-700 hover:text-[#E23744] font-semibold transition duration-300">Menu</a>
+                    <a href="{% url 'reservations' %}" class="text-gray-700 hover:text-[#E23744] font-semibold transition duration-300">Reservations</a>
+                    <a href="{% url 'about' %}" class="text-gray-700 hover:text-[#E23744] font-semibold transition duration-300">About</a>
+                    <a href="{% url 'contact' %}" class="text-gray-700 hover:text-[#E23744] font-semibold transition duration-300">Contact</a>
                 </nav>
+
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'feedback' %}" class="hidden md:block text-white bg-[#E23744] px-5 py-2 rounded-full font-semibold hover:bg-[#FF6B6B] transition duration-300 transform hover:scale-105 shadow-md">Feedback</a>
+                    <a href="{% url 'cart' %}" class="text-gray-700 hover:text-[#E23744] font-semibold transition duration-300 relative">
+                        <i class="fi fi-rr-shopping-cart text-xl"></i>
+                        {% if cart_item_count > 0 %}
+                        <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">{{ cart_item_count }}</span>
+                        {% endif %}
+                    </a>
+                    
+                    {% if user.is_authenticated %}
+                        <span class="text-gray-700 font-medium hidden md:block">Hi, {{ user.username }}</span>
+                        <form method="post" action="{% url 'logout' %}" class="hidden md:block">
+                            {% csrf_token %}
+                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300">Logout</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="hidden md:block bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition duration-300">Login</a>
+                        <a href="{% url 'register' %}" class="bg-[#E23744] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#FF6B6B] transition duration-300 transform hover:scale-105">Register</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </header>

@@ -142,3 +142,12 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 DEFAULT_FROM_EMAIL = "noreply@swaadify.in"
 RESTAURANT_EMAIL = "contact@swaadify.in"   # where notifications go
+
+# Redirect unauthorized users here
+LOGIN_URL = "login"
+
+# After successful login
+LOGIN_REDIRECT_URL = "home"
+
+# After logout
+LOGOUT_REDIRECT_URL = "login"

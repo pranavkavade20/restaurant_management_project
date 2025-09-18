@@ -12,6 +12,7 @@ from products.models import MenuItem
 from .forms import *
 from .models import MenuCategory
 from .serializers import MenuCategorySerializer,MenuItemSerializer
+
 # Display Restaurant name
 def homepage_view(request):
     # Contact form on homepage
