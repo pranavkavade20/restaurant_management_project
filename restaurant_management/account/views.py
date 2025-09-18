@@ -2,6 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from utils.validation_utils import is_valid_email
 from .forms import RegisterForm, LoginForm
 from .models import UserProfile
 
@@ -32,7 +37,6 @@ def register_view(request):
         form = RegisterForm()
     return render(request, "accounts/register.html", {"form": form})
 
-
 def login_view(request):
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
@@ -50,8 +54,19 @@ def login_view(request):
         form = LoginForm()
     return render(request, "accounts/login.html", {"form": form})
 
-
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect("login")
+
+class RegisterView(APIView):
+    def post(self, request, *args, **kwargs):
+        email = request.data.get("email")
+        if not is_valid_email(email):
+            return Response(
+                {"error": "Invalid email address"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Continue with registration logic...
+        return Response({"message": "Email is valid!"}, status=status.HTTP_200_OK)
