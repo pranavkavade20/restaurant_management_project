@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Order,OrderStatus,Coupon
+from .models import Order,OrderStatus,Coupon,OrderItem
 
 # Register the order model
 admin.site.register(Order)
+admin.site.register(OrderItem)
 
 @admin.register(OrderStatus)
 class OrderStatusAdmin(admin.ModelAdmin):
