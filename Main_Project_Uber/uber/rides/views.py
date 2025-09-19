@@ -380,12 +380,47 @@ class RideFeedbackCreateView(APIView):
         except PermissionDenied as exc:
             return Response({"error": str(exc.detail)}, status=status.HTTP_403_FORBIDDEN)
 
-class FareCalculationView(generics.UpdateAPIView):
+class CalculateFareView(APIView):
     """
-    Endpoint: /api/rides/<ride_id>/calculate-fare/
-    Allows authenticated users to calculate the final fare of a completed ride.
+    POST endpoint to calculate and store fare for a completed ride.
+    Only accessible to the ride's rider, driver, or admin.
     """
-    queryset = Ride.objects.all()
-    serializer_class = FareCalculationSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    lookup_field = "id"
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, ride_id):
+        ride = get_object_or_404(Ride, id=ride_id)
+
+        # ✅ Security: Only rider, driver, or admin can access
+        user = request.user
+        if not (user.is_staff or ride.rider.user == user or (ride.driver and ride.driver.user == user)):
+            return Response(
+                {"error": "You are not authorized to calculate fare for this ride."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # ✅ Ensure ride is completed
+        if ride.status != Ride.Status.COMPLETED:
+            return Response(
+                {"error": "Ride must be completed before fare calculation."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # ✅ Prevent recalculation if fare already set
+        if ride.fare is not None:
+            return Response(
+                {"error": "Fare already set."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = FareCalculationSerializer(instance=ride, data={}, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            {
+                "fare": ride.fare,
+                "message": "Fare calculated and saved.",
+            },
+            status=status.HTTP_200_OK,
+        )
+
