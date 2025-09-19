@@ -2,6 +2,8 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from django.utils.translation import gettext_lazy as _
+from decimal import Decimal
+from utils.geo_utils import calculate_distance
 
 # Local modules.
 from .models import Ride, RideFeedback
@@ -185,3 +187,41 @@ class RideFeedbackSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return RideFeedback.objects.create(**validated_data)
+
+class FareCalculationSerializer(serializers.ModelSerializer):
+    """
+    Serializer to calculate and save fare for completed rides.
+    """
+
+    class Meta:
+        model = Ride
+        fields = ["id", "status", "fare", "pickup_lat", "pickup_lng", "drop_lat", "drop_lng"]
+
+    def validate(self, attrs):
+        ride = self.instance
+
+        if ride.status != Ride.Status.COMPLETED:
+            raise serializers.ValidationError("Fare can only be calculated for COMPLETED rides.")
+
+        if ride.fare is not None:
+            raise serializers.ValidationError("Fare has already been calculated for this ride.")
+
+        return attrs
+
+    def update(self, instance, validated_data):
+        base_fare = Decimal("50.00")
+        per_km_rate = Decimal("10.00")
+        surge_multiplier = Decimal("1.0")  # make dynamic later
+
+        distance_km = Decimal(
+            calculate_distance(
+                instance.pickup_lat, instance.pickup_lng,
+                instance.drop_lat, instance.drop_lng
+            )
+        )
+
+        fare = base_fare + (distance_km * per_km_rate * surge_multiplier)
+
+        instance.fare = round(fare, 2)
+        instance.save(update_fields=["fare"])
+        return instance

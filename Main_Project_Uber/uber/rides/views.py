@@ -19,9 +19,9 @@ from .serializers import (
             LocationUpdateSerializer, 
             RideTrackSerializer,
             RideHistorySerializer,
-            RideFeedbackSerializer
+            RideFeedbackSerializer,
+            FareCalculationSerializer
     ) 
-
 
 class RideRequestCreateView(generics.CreateAPIView):
     """
@@ -310,7 +310,6 @@ def _get_driver_profile(user):
     """Helper: tolerant lookup for driver profile attribute names."""
     return getattr(user, "driver_profile", None) or getattr(user, "driver", None)
 
-
 class RideFeedbackCreateView(APIView):
     """
     POST /api/ride/feedback/<ride_id>/
@@ -380,3 +379,13 @@ class RideFeedbackCreateView(APIView):
             return Response(exc.detail, status=status.HTTP_400_BAD_REQUEST)
         except PermissionDenied as exc:
             return Response({"error": str(exc.detail)}, status=status.HTTP_403_FORBIDDEN)
+
+class FareCalculationView(generics.UpdateAPIView):
+    """
+    Endpoint: /api/rides/<ride_id>/calculate-fare/
+    Allows authenticated users to calculate the final fare of a completed ride.
+    """
+    queryset = Ride.objects.all()
+    serializer_class = FareCalculationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "id"
