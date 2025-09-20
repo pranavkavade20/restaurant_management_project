@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError, PermissionDenied
 from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
 from utils.geo_utils import calculate_distance
-
+from django.utils import timezone
 # Local modules.
 from .models import Ride, RideFeedback
 
@@ -225,3 +225,40 @@ class FareCalculationSerializer(serializers.ModelSerializer):
         instance.fare = round(fare, 2)
         instance.save(update_fields=["fare"])
         return instance
+
+class RidePaymentSerializer(serializers.ModelSerializer):
+    """
+    Serializer to update ride payment details.
+    Ensures business rules:
+    - Payment can only be marked PAID if ride is COMPLETED.
+    - Prevents updating if already PAID.
+    """
+
+    class Meta:
+        model = Ride
+        fields = ["payment_status", "payment_method"]
+
+    def validate(self, attrs):
+        ride = self.instance
+        new_status = attrs.get("payment_status")
+        new_method = attrs.get("payment_method")
+
+        # Prevent re-payment
+        if ride.payment_status == Ride.PaymentStatus.PAID:
+            raise serializers.ValidationError("This ride is already marked as PAID.")
+
+        # Only completed rides can be paid
+        if new_status == Ride.PaymentStatus.PAID and ride.status != Ride.Status.COMPLETED:
+            raise serializers.ValidationError("Ride must be COMPLETED before marking as PAID.")
+
+        # Ensure payment method is provided if marking paid
+        if new_status == Ride.PaymentStatus.PAID and not new_method:
+            raise serializers.ValidationError("Payment method is required when marking as PAID.")
+
+        return attrs
+
+    def update(self, instance, validated_data):
+        if validated_data.get("payment_status") == Ride.PaymentStatus.PAID:
+            instance.paid_at = timezone.now()
+
+        return super().update(instance, validated_data)

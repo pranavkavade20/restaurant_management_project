@@ -3,11 +3,65 @@ from .models import Ride ,RideFeedback
 
 @admin.register(Ride)
 class RideAdmin(admin.ModelAdmin):
-    """Admin settings for Ride model for easier debugging and monitoring."""
-    list_display = ("id", "rider", "driver", "status","fare","pickup_address", "dropoff_address", "requested_at")
-    list_filter = ("status", "requested_at")
-    search_fields = ("rider__user__username", "driver__user__username", "pickup_address", "dropoff_address")
-    ordering = ("-requested_at",)
+    """
+    Admin configuration for the Ride model.
+    Includes filters, search, and read-only fields for better payment tracking.
+    """
+
+    list_display = (
+        "id",
+        "rider",
+        "driver",
+        "status",
+        "fare",
+        "payment_status",
+        "payment_method",
+        "paid_at",
+        "requested_at",
+    )
+    list_filter = (
+        "status",
+        "payment_status",
+        "payment_method",
+        "requested_at",
+    )
+    search_fields = (
+        "rider__user__username",
+        "driver__user__username",
+        "pickup_address",
+        "dropoff_address",
+    )
+    readonly_fields = ("requested_at", "updated_at", "paid_at")
+
+    fieldsets = (
+        ("Ride Details", {
+            "fields": (
+                "rider",
+                "driver",
+                "pickup_address",
+                "dropoff_address",
+                "pickup_lat",
+                "pickup_lng",
+                "drop_lat",
+                "drop_lng",
+                "status",
+                "fare",
+            ),
+        }),
+        ("Payment Information", {
+            "fields": (
+                "payment_status",
+                "payment_method",
+                "paid_at",
+            ),
+        }),
+        ("Timestamps", {
+            "fields": (
+                "requested_at",
+                "updated_at",
+            ),
+        }),
+    )
 
 @admin.register(RideFeedback)
 class RideFeedbackAdmin(admin.ModelAdmin):

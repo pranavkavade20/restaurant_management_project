@@ -6,7 +6,6 @@ from django.conf import settings
 # Explicit imports from accounts app
 from accounts.models import Rider, Driver
 
-
 class Ride(models.Model):
     """
     Represents a ride request in the system.
@@ -19,7 +18,16 @@ class Ride(models.Model):
         COMPLETED = "COMPLETED", "Completed"
         CANCELLED = "CANCELLED", "Cancelled"
 
-    # Foreign keys to accounts app
+    class PaymentStatus(models.TextChoices):
+        PAID = "PAID", "Paid"
+        UNPAID = "UNPAID", "Unpaid"
+
+    class PaymentMethod(models.TextChoices):
+        CASH = "CASH", "Cash"
+        UPI = "UPI", "UPI"
+        CARD = "CARD", "Card"
+
+    # Foreign keys
     rider = models.ForeignKey(
         Rider,
         related_name="rides",
@@ -35,7 +43,7 @@ class Ride(models.Model):
         help_text="Driver assigned to this ride (null until accepted).",
     )
 
-    # Addresses (user-friendly)
+    # Addresses
     pickup_address = models.CharField(max_length=255)
     dropoff_address = models.CharField(max_length=255)
 
@@ -45,20 +53,40 @@ class Ride(models.Model):
     drop_lat = models.DecimalField(max_digits=9, decimal_places=6)
     drop_lng = models.DecimalField(max_digits=9, decimal_places=6)
 
-    # Status of the ride
+    # Status
     status = models.CharField(
         max_length=16,
         choices=Status.choices,
         default=Status.REQUESTED,
     )
 
-    # Fare pricing
+    # Fare
     fare = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         null=True,
         blank=True,
         help_text="Final fare after ride completion.",
+    )
+
+    # Payment tracking
+    payment_status = models.CharField(
+        max_length=8,
+        choices=PaymentStatus.choices,
+        default=PaymentStatus.UNPAID,
+        help_text="Tracks whether the ride is paid or unpaid.",
+    )
+    payment_method = models.CharField(
+        max_length=8,
+        choices=PaymentMethod.choices,
+        null=True,
+        blank=True,
+        help_text="Method of payment (Cash, UPI, Card).",
+    )
+    paid_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when payment was confirmed.",
     )
 
     requested_at = models.DateTimeField(default=timezone.now)
@@ -69,10 +97,12 @@ class Ride(models.Model):
         indexes = [
             models.Index(fields=["status"]),
             models.Index(fields=["requested_at"]),
+            models.Index(fields=["payment_status"]),
         ]
 
     def __str__(self):
         return f"Ride({self.pk}) {self.status} - Rider:{self.rider.user.username}"
+
 
 class RideFeedback(models.Model):
     """

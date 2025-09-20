@@ -20,7 +20,9 @@ from .serializers import (
             RideTrackSerializer,
             RideHistorySerializer,
             RideFeedbackSerializer,
-            FareCalculationSerializer
+            FareCalculationSerializer,
+            RidePaymentSerializer
+
     ) 
 
 class RideRequestCreateView(generics.CreateAPIView):
@@ -424,3 +426,13 @@ class CalculateFareView(APIView):
             status=status.HTTP_200_OK,
         )
 
+class RidePaymentUpdateView(generics.UpdateAPIView):
+    """
+    API endpoint to update ride payment details.
+    Example:
+        POST /api/ride/payment/<ride_id>/
+    """
+    queryset = Ride.objects.all()
+    serializer_class = RidePaymentSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = "pk"
