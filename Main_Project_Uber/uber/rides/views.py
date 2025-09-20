@@ -12,6 +12,7 @@ from accounts.permissions import IsRider, IsDriver,IsRideRiderOrAssignedDriverOr
 from accounts.models import Driver
 
 # Ride app 
+from .permissions import IsRideParticipant
 from .models import Ride, RideFeedback
 from .serializers import (
             RideRequestSerializer, 
@@ -426,13 +427,31 @@ class CalculateFareView(APIView):
             status=status.HTTP_200_OK,
         )
 
-class RidePaymentUpdateView(generics.UpdateAPIView):
+class RidePaymentAPIView(generics.GenericAPIView):
     """
-    API endpoint to update ride payment details.
-    Example:
-        POST /api/ride/payment/<ride_id>/
+    API endpoint to mark a ride as PAID with the chosen payment method.
+    URL: PATCH /api/ride/payment/<ride_id>/
+
+    Only PATCH is allowed for updates (REST-compliant).
     """
+
     queryset = Ride.objects.all()
     serializer_class = RidePaymentSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = "pk"
+    permission_classes = [IsAuthenticated, IsRideParticipant]
+    lookup_url_kwarg = "pk"
+
+    def patch(self, request, *args, **kwargs):
+        ride = self.get_object()
+
+        serializer = self.get_serializer(ride, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            {
+                "message": "Payment marked as complete.",
+                "status": ride.payment_status,
+                "method": ride.payment_method
+            },
+            status=status.HTTP_200_OK
+        )
