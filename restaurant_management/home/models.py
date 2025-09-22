@@ -1,5 +1,5 @@
 from django.db import models
-
+from multiselectfield import MultiSelectField
 # Feedback model
 class Feedback(models.Model):
     comment = models.TextField()
@@ -32,16 +32,50 @@ class Address(models.Model):
         return f"{self.address}, {self.city}, {self.state} {self.zip_code}"
 
 # Restaurant model
-class Restaurant(models.Model):
-    name = models.CharField(max_length=200)
-    phone = models.CharField(max_length=15)
-    address = models.OneToOneField("Address", on_delete=models.CASCADE, null=True, blank=True)
 
-    # Dictionary like {"Monday": "9 AM - 10 PM", "Tuesday": "Closed", ...}
+class Restaurant(models.Model):
+    # ------------------------
+    # Basic restaurant details
+    # ------------------------
+    name = models.CharField(max_length=200, help_text="Name of the restaurant")
+    phone = models.CharField(max_length=15, help_text="Contact number")
+    address = models.OneToOneField(
+        Address,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text="One-to-one mapping with Address"
+    )
+
+    # ------------------------
+    # Opening hours per day
+    # Example: {"Monday": "9 AM - 10 PM", "Tuesday": "Closed"}
+    # ------------------------
     opening_hours = models.JSONField(default=dict, blank=True)
+
+    # ------------------------
+    # Operating days (business days)
+    # ------------------------
+    DAYS_OF_WEEK = (
+        ("Mon", "Monday"),
+        ("Tue", "Tuesday"),
+        ("Wed", "Wednesday"),
+        ("Thu", "Thursday"),
+        ("Fri", "Friday"),
+        ("Sat", "Saturday"),
+        ("Sun", "Sunday"),
+    )
+
+    operating_days = MultiSelectField(
+        choices=DAYS_OF_WEEK,
+        max_length=20,
+        blank=True,
+        help_text="Days when the restaurant is open (e.g., Mon, Tue, Wed)"
+    )
 
     def __str__(self):
         return self.name
+
 
 # MenuCategoru model
 class MenuCategory(models.Model):
