@@ -4,6 +4,25 @@ from products.models import MenuItem
 from django.conf import settings 
 from django.utils import timezone
 
+class OrderQuerySet(models.QuerySet):
+    def active(self):
+        """
+        Returns only active orders.
+        Active orders are defined as those with status 'Pending' or 'Processing'.
+        """
+        return self.filter(order_status__name__in=["Pending", "Processing"])
+
+
+class OrderManager(models.Manager):
+    def get_queryset(self):
+        return OrderQuerySet(self.model, using=self._db)
+
+    def get_active_orders(self):
+        """
+        Public method to easily retrieve only active orders.
+        """
+        return self.get_queryset().active()
+    
 class OrderStatus(models.Model):
     """
     Represents different statuses of an order 
@@ -43,6 +62,8 @@ class Order(models.Model):
     # It store the time at the created of Order.
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Assign the custom manager
+    objects = OrderManager()
     def __str__(self):
         # Return username(customer) with id
         return f"Order #{self.id} by {self.customer.username}"
