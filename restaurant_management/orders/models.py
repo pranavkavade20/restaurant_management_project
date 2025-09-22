@@ -1,32 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
-from products.models import MenuItem
 from django.conf import settings 
 from django.utils import timezone
 
-class OrderQuerySet(models.QuerySet):
-    def active(self):
-        """
-        Returns only active orders.
-        Active orders are defined as those with status 'Pending' or 'Processing'.
-        """
-        return self.filter(order_status__name__in=["Pending", "Processing"])
+from products.models import MenuItem
 
-
-class OrderManager(models.Manager):
-    def get_queryset(self):
-        return OrderQuerySet(self.model, using=self._db)
-
-    def get_active_orders(self):
-        """
-        Public method to easily retrieve only active orders.
-        """
-        return self.get_queryset().active()
-    
 class OrderStatus(models.Model):
     """
     Represents different statuses of an order 
-    (e.g., Pending, Processing, Completed, Cancelled).
+    (e.g., Pending, Processing, Delivered, Cancelled).
     """
     name = models.CharField(
         max_length=50,
@@ -38,52 +20,112 @@ class OrderStatus(models.Model):
     class Meta:
         verbose_name = "Order Status"
         verbose_name_plural = "Order Statuses"
-        ordering = ["id"]  # keep consistent creation order
+        ordering = ["id"]  # preserve consistent creation order
 
     def __str__(self):
         return self.name
-    
-# Order model that store the orders.
+
+
+class OrderQuerySet(models.QuerySet):
+    def active(self):
+        """Return only active orders (Pending / Processing)."""
+        return self.filter(order_status__name__in=["Pending", "Processing"])
+
+
+class OrderManager(models.Manager):
+    def get_queryset(self):
+        return OrderQuerySet(self.model, using=self._db)
+
+    def get_active_orders(self):
+        """Retrieve only active orders easily via manager method."""
+        return self.get_queryset().active()
+
+
 class Order(models.Model):
-    # Choices that show status realted to order_status.
+    """
+    Stores a single order placed by a customer.
+    Links to `User` for customer, and tracks status via `OrderStatus`.
+    """
     STATUS_CHOICES = [
-        ('PENDING','Pending'),
-        ('PROCESSING','Processing'),
-        ('DELIVERED','Delivered'),
-        ('CANCELLED','Cancelled'),
+        ("Pending", "Pending"),
+        ("Processing", "Processing"),
+        ("Delivered", "Delivered"),
+        ("Cancelled", "Cancelled"),
     ]
 
-    # This field connected to User. 
-    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders') 
-    # It store decimal field to store total price of menu.
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    # It store status of order.
-    order_status = models.ForeignKey(OrderStatus, on_delete=models.SET_NULL, null=True,default="PENDING")
-    # It store the time at the created of Order.
-    created_at = models.DateTimeField(auto_now_add=True)
+    # Foreign key to the customer (User who placed the order)
+    customer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="orders",
+        help_text="The customer who placed the order"
+    )
 
-    # Assign the custom manager
+    # Total price of all items in this order
+    total_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0.00,
+        help_text="Total amount for this order"
+    )
+
+    # Status of the order, linked to OrderStatus
+    order_status = models.ForeignKey(
+        OrderStatus,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="orders",  # 🔹 added related_name for clarity
+        default=None,
+        help_text="Current status of the order"
+    )
+
+    # Timestamp of when the order was created
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="Date and time when the order was created"
+    )
+
+    # Assign custom manager
     objects = OrderManager()
+
     def __str__(self):
-        # Return username(customer) with id
         return f"Order #{self.id} by {self.customer.username}"
 
-# OrderItem field related to Order for storing order item specifically.
+
 class OrderItem(models.Model):
-    # It store order items spcifically related to order model.
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-    # This help to store menu specifically in OrderItem model. This connected to Item model which has menus.
-    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
-    # It store quantiy of items.
-    quantity = models.PositiveIntegerField(default=1)
+    """
+    Represents an item within a specific Order.
+    Links to a MenuItem and tracks quantity ordered.
+    """
+    # The order this item belongs to
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="order_items",
+        help_text="The order this item belongs to"
+    )
+
+    # The menu item being ordered
+    menu_item = models.ForeignKey(
+        "home.MenuItem",
+        on_delete=models.CASCADE,
+        help_text="The menu item included in this order"
+    )
+
+    # Quantity of this menu item in the order
+    quantity = models.PositiveIntegerField(
+        default=1,
+        help_text="Quantity of this menu item in the order"
+    )
 
     def __str__(self):
-        # Returns quantity of menu items.
-        return f"{self.quantity} X {self.menu_item.name} (Order # {self.order.id})"
-    
-    def get_item_total(self): 
-        # Returns total price of menu_item with help of quantity.
+        return f"{self.quantity} x {self.menu_item.name} (Order #{self.order.id})"
+
+    @property
+    def item_total(self):
+        """Return total price for this menu item (price * quantity)."""
         return self.menu_item.price * self.quantity
+
 
 class Cart(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
