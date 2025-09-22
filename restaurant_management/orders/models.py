@@ -107,7 +107,7 @@ class OrderItem(models.Model):
 
     # The menu item being ordered
     menu_item = models.ForeignKey(
-        "home.MenuItem",
+        MenuItem,
         on_delete=models.CASCADE,
         help_text="The menu item included in this order"
     )
