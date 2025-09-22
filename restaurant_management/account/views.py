@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status,generics, permissions
 
 from utils.validation_utils import is_valid_email
 from .forms import RegisterForm, LoginForm
@@ -70,3 +70,23 @@ class RegisterView(APIView):
         
         # Continue with registration logic...
         return Response({"message": "Email is valid!"}, status=status.HTTP_200_OK)
+
+
+from rest_framework import generics, permissions
+from django.contrib.auth.models import User
+from .serializers import UserProfileSerializer
+
+
+class UserProfileUpdateView(generics.UpdateAPIView):
+    """
+    API endpoint that allows a logged-in user to update their profile.
+    Uses PUT or PATCH requests.
+    """
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        """
+        Restrict the object to the currently authenticated user only.
+        """
+        return self.request.user
