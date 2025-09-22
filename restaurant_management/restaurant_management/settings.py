@@ -149,6 +149,8 @@ ALLOWED_HOSTS = ['*']  # Or your actual host/domain
 # For Development email backend
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = "noreply@swaadify.in"
 RESTAURANT_EMAIL = "contact@swaadify.in"   # where notifications go
 
