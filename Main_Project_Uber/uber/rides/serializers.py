@@ -5,6 +5,8 @@ from django.utils.translation import gettext_lazy as _
 from decimal import Decimal
 from utils.geo_utils import calculate_distance
 from django.utils import timezone
+from django.db.models import Sum, Count, Avg
+from datetime import timedelta
 # Local modules.
 from .models import Ride, RideFeedback
 
@@ -262,3 +264,53 @@ class RidePaymentSerializer(serializers.ModelSerializer):
             instance.paid_at = timezone.now()
 
         return super().update(instance, validated_data)
+
+class DriverEarningsSummarySerializer(serializers.Serializer):
+    """
+    Serializer to compute and return earnings + ride summary for a driver
+    in the last 7 days.
+    """
+
+    total_rides = serializers.IntegerField()
+    total_earnings = serializers.DecimalField(max_digits=10, decimal_places=2)
+    payment_breakdown = serializers.DictField(
+        child=serializers.IntegerField(), allow_empty=True
+    )
+    average_fare = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    @classmethod
+    def build_summary(cls, driver):
+        """
+        Build earnings + rides summary for the past 7 days.
+        """
+
+        seven_days_ago = timezone.now() - timedelta(days=7)
+
+        rides = Ride.objects.filter(
+            driver=driver,
+            status="COMPLETED",
+            payment_status="PAID",
+            completed_at__gte=seven_days_ago,
+        )
+
+        # Aggregations
+        total_rides = rides.count()
+        total_earnings = rides.aggregate(total=Sum("fare"))["total"] or 0
+        average_fare = rides.aggregate(avg=Avg("fare"))["avg"] or 0
+
+        # Payment breakdown
+        payment_counts = (
+            rides.values("payment_method")
+            .annotate(count=Count("id"))
+            .order_by()
+        )
+
+        breakdown_dict = {item["payment_method"]: item["count"] for item in payment_counts}
+
+        # Serialize the data structure
+        return cls({
+            "total_rides": total_rides,
+            "total_earnings": total_earnings,
+            "payment_breakdown": breakdown_dict,
+            "average_fare": average_fare,
+        })
