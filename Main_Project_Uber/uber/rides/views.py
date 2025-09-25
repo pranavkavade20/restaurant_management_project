@@ -13,6 +13,7 @@ from accounts.models import Driver
 
 # Ride app 
 from .permissions import IsRideParticipant
+from accounts.permissions import IsDriver
 from .models import Ride, RideFeedback
 from .serializers import (
             RideRequestSerializer, 
@@ -22,8 +23,8 @@ from .serializers import (
             RideHistorySerializer,
             RideFeedbackSerializer,
             FareCalculationSerializer,
-            RidePaymentSerializer
-
+            RidePaymentSerializer,
+            DriverEarningsSummarySerializer,
     ) 
 
 class RideRequestCreateView(generics.CreateAPIView):
@@ -455,3 +456,15 @@ class RidePaymentAPIView(generics.GenericAPIView):
             },
             status=status.HTTP_200_OK
         )
+
+class DriverEarningsSummaryView(APIView):
+    """
+    API endpoint for drivers to fetch their 7-day earnings summary.
+    """
+
+    permission_classes = [IsAuthenticated, IsDriver]
+
+    def get(self, request, *args, **kwargs):
+        driver = request.user.driver_profile  # Driver profile linked to User
+        serializer = DriverEarningsSummarySerializer.build_summary(driver)
+        return Response(serializer.data, status=status.HTTP_200_OK)

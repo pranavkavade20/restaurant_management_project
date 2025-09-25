@@ -10,6 +10,7 @@ from .views import (
     RideFeedbackCreateView,
     CalculateFareView,
     RidePaymentAPIView,
+    DriverEarningsSummaryView,
 )
 urlpatterns = [
     path("request/", RideRequestCreateView.as_view(), name="ride-request"),
@@ -20,7 +21,7 @@ urlpatterns = [
     path("rider/history/", RiderHistoryView.as_view(), name="rider-history"),
     path("driver/history/", DriverHistoryView.as_view(), name="driver-history"),
     path("feedback/<int:ride_id>/", RideFeedbackCreateView.as_view(), name="ride-feedback"),
-     path("calculate-fare/<int:ride_id>/", CalculateFareView.as_view(), name="calculate-fare"),
-     path("payment/<int:pk>/", RidePaymentAPIView.as_view(), name="ride-payment"),
-    
+    path("calculate-fare/<int:ride_id>/", CalculateFareView.as_view(), name="calculate-fare"),
+    path("payment/<int:pk>/", RidePaymentAPIView.as_view(), name="ride-payment"),
+    path("driver/earnings/", DriverEarningsSummaryView.as_view(), name="driver-earnings"),
 ]

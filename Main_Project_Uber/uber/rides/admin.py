@@ -3,65 +3,57 @@ from .models import Ride ,RideFeedback
 
 @admin.register(Ride)
 class RideAdmin(admin.ModelAdmin):
-    """
-    Admin configuration for the Ride model.
-    Includes filters, search, and read-only fields for better payment tracking.
-    """
+    """Admin configuration for the Ride model."""
 
+    # Fields to display in the list view
     list_display = (
-        "id",
-        "rider",
-        "driver",
-        "status",
-        "fare",
-        "payment_status",
-        "payment_method",
-        "paid_at",
-        "requested_at",
+        'id',
+        'rider',
+        'driver',
+        'status',
+        'payment_status',
+        'fare',
+        'requested_at',
+        'completed_at',
+        'paid_at',
     )
-    list_filter = (
-        "status",
-        "payment_status",
-        "payment_method",
-        "requested_at",
-    )
-    search_fields = (
-        "rider__user__username",
-        "driver__user__username",
-        "pickup_address",
-        "dropoff_address",
-    )
-    readonly_fields = ("requested_at", "updated_at", "paid_at")
 
+    # Fields that can be clicked to go to the edit page
+    list_display_links = ('id', 'rider', 'driver')
+
+    # Filters for the right sidebar
+    list_filter = ('status', 'payment_status', 'payment_method', 'requested_at', 'completed_at')
+
+    # Searchable fields
+    search_fields = (
+        'rider__user__username',
+        'driver__user__username',
+        'pickup_address',
+        'dropoff_address',
+    )
+
+    # Ordering by default
+    ordering = ('-requested_at',)
+
+    # Read-only fields (timestamps should not be edited manually)
+    readonly_fields = ('requested_at', 'completed_at', 'paid_at')
+
+    # Field grouping in detail view
     fieldsets = (
-        ("Ride Details", {
-            "fields": (
-                "rider",
-                "driver",
-                "pickup_address",
-                "dropoff_address",
-                "pickup_lat",
-                "pickup_lng",
-                "drop_lat",
-                "drop_lng",
-                "status",
-                "fare",
-            ),
+        ('Ride Info', {
+            'fields': ('rider', 'driver', 'status', 'fare', 'payment_status', 'payment_method')
         }),
-        ("Payment Information", {
-            "fields": (
-                "payment_status",
-                "payment_method",
-                "paid_at",
-            ),
+        ('Addresses', {
+            'fields': ('pickup_address', 'dropoff_address', ('pickup_lat', 'pickup_lng'), ('drop_lat', 'drop_lng'))
         }),
-        ("Timestamps", {
-            "fields": (
-                "requested_at",
-                "updated_at",
-            ),
+        ('Timestamps', {
+            'fields': ('requested_at', 'completed_at', 'paid_at')
         }),
     )
+
+    # Optional: enable autocomplete for foreign keys if you have many riders/drivers
+    autocomplete_fields = ('rider', 'driver')
+
 
 @admin.register(RideFeedback)
 class RideFeedbackAdmin(admin.ModelAdmin):

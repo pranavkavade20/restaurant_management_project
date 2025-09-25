@@ -290,7 +290,7 @@ class DriverEarningsSummarySerializer(serializers.Serializer):
             driver=driver,
             status="COMPLETED",
             payment_status="PAID",
-            completed_at__gte=seven_days_ago,
+            updated_at__gte = seven_days_ago,
         )
 
         # Aggregations

@@ -5,7 +5,6 @@ from django.conf import settings
 
 # Explicit imports from accounts app
 from accounts.models import Rider, Driver
-
 class Ride(models.Model):
     """
     Represents a ride request in the system.
@@ -59,6 +58,9 @@ class Ride(models.Model):
         choices=Status.choices,
         default=Status.REQUESTED,
     )
+    completed_at = models.DateTimeField(
+        null=True, blank=True, help_text="Timestamp when ride was completed."
+    )
 
     # Fare
     fare = models.DecimalField(
@@ -100,9 +102,28 @@ class Ride(models.Model):
             models.Index(fields=["payment_status"]),
         ]
 
+    def save(self, *args, **kwargs):
+        # Fetch previous state from DB if it exists
+        if self.pk:
+            previous = Ride.objects.filter(pk=self.pk).first()
+            if previous:
+                # If status changed to COMPLETED and completed_at is not set
+                if self.status == self.Status.COMPLETED and not previous.status == self.Status.COMPLETED:
+                    self.completed_at = timezone.now()
+                # If payment_status changed to PAID and paid_at is not set
+                if self.payment_status == self.PaymentStatus.PAID and not previous.payment_status == self.PaymentStatus.PAID:
+                    self.paid_at = timezone.now()
+        else:
+            # New ride instance: automatically set completed_at/paid_at if status/payment_status is already set
+            if self.status == self.Status.COMPLETED:
+                self.completed_at = timezone.now()
+            if self.payment_status == self.PaymentStatus.PAID:
+                self.paid_at = timezone.now()
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Ride({self.pk}) {self.status} - Rider:{self.rider.user.username}"
-
 
 class RideFeedback(models.Model):
     """
