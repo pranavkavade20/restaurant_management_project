@@ -103,7 +103,7 @@ class DriverLogoutView(APIView):
         serializer = LogoutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"message": "Driver logged out successfully."}, status=status.HTTP_205_RESET_CONTENT)
+        return Response({"message": "Driver logged out successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 class DriverAvailabilityToggleView(APIView):
     """
