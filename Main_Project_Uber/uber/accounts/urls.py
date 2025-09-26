@@ -7,6 +7,7 @@ from .views import (
     RiderLogoutView, 
     DriverLogoutView, 
     ProtectedTestView,
+    DriverAvailabilityToggleView,
 )
 urlpatterns = [
     path("register/rider/", RiderRegistrationView.as_view(), name="register-rider"),
@@ -16,4 +17,5 @@ urlpatterns = [
     path("auth/logout/rider/", RiderLogoutView.as_view(), name="rider-logout"),
     path("auth/logout/driver/", DriverLogoutView.as_view(), name="driver-logout"),
     path("protected/", ProtectedTestView.as_view(), name="protected-test"),
+    path("driver/availability/", DriverAvailabilityToggleView.as_view(), name="driver-availability"),
 ]

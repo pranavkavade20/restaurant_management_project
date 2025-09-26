@@ -6,14 +6,17 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 # Local Modules
+from .models import Driver
 from .serializers import ( 
     RiderRegistrationSerializer, 
     DriverRegistrationSerializer, 
     UserSerializer,
     RiderLoginSerializer, 
     DriverLoginSerializer,
-    LogoutSerializer
+    LogoutSerializer,
+    DriverAvailabilitySerializer,
 )
+
 class RiderRegistrationView(generics.GenericAPIView):
     """API endpoint for Rider registration."""
     serializer_class = RiderRegistrationSerializer
@@ -102,3 +105,36 @@ class DriverLogoutView(APIView):
         serializer.save()
         return Response({"message": "Driver logged out successfully."}, status=status.HTTP_205_RESET_CONTENT)
 
+class DriverAvailabilityToggleView(APIView):
+    """
+    API endpoint for drivers to toggle availability (online/offline).
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        # Ensure driver profile exists
+        try:
+            driver = request.user.driver_profile
+        except Driver.DoesNotExist:
+            return Response(
+                {"detail": "Driver profile not found. Only drivers can toggle availability."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Validate and update availability
+        serializer = DriverAvailabilitySerializer(
+            instance=driver,
+            data=request.data,
+            context={"request": request},
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        updated_driver = serializer.save()
+
+        return Response(
+            {
+                "message": "Availability updated successfully.",
+                "is_available": updated_driver.availability_status,
+            },
+            status=status.HTTP_200_OK,
+        )
