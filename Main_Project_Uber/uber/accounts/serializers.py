@@ -142,3 +142,24 @@ class LogoutSerializer(serializers.Serializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             raise serializers.ValidationError("Invalid or expired refresh token.")
+
+class DriverAvailabilitySerializer(serializers.Serializer):
+    """
+    Serializer for toggling driver availability.
+    Maps 'is_available' in API payload to 'availability_status' in model.
+    """
+    is_available = serializers.BooleanField()
+
+    def validate(self, attrs):
+        request = self.context.get("request")
+        if not hasattr(request.user, "driver_profile"):
+            raise serializers.ValidationError("You do not have a driver profile.")
+        return attrs
+
+    def update(self, instance, validated_data):
+        instance.availability_status = validated_data.get(
+            "is_available", instance.availability_status
+        )
+        instance.save(update_fields=["availability_status"])
+        return instance
+
