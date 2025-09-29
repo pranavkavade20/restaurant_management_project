@@ -11,6 +11,7 @@ from .models import Cart, CartItem,Order
 from products.models import MenuItem
 from .serializers import OrderSerializer,OrderDetailSerializer
 
+@login_required
 def cart_view(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     return render(request, "cart.html", {"cart": cart})

@@ -2,8 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings 
 from django.utils import timezone
+from decimal import Decimal
 
 from products.models import MenuItem
+
 
 class OrderStatus(models.Model):
     """
@@ -25,12 +27,10 @@ class OrderStatus(models.Model):
     def __str__(self):
         return self.name
 
-
 class OrderQuerySet(models.QuerySet):
     def active(self):
         """Return only active orders (Pending / Processing)."""
         return self.filter(order_status__name__in=["Pending", "Processing"])
-
 
 class OrderManager(models.Manager):
     def get_queryset(self):
@@ -39,7 +39,6 @@ class OrderManager(models.Manager):
     def get_active_orders(self):
         """Retrieve only active orders easily via manager method."""
         return self.get_queryset().active()
-
 
 class Order(models.Model):
     """
@@ -90,7 +89,20 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id} by {self.customer.username}"
-
+    
+    def calculate_total(self) -> Decimal:
+        """
+        Calculate the total cost of all items in this order.
+        Updates the `total_amount` field and returns the computed total.
+        """
+        total = sum((item.item_total for item in self.order_items.all()), Decimal("0.00"))
+        self.total_amount = total
+        return total
+    
+    def save(self, *args, **kwargs):
+        # Auto-update total before saving
+        self.calculate_total()
+        super().save(*args, **kwargs)
 
 class OrderItem(models.Model):
     """
@@ -125,7 +137,6 @@ class OrderItem(models.Model):
     def item_total(self):
         """Return total price for this menu item (price * quantity)."""
         return self.menu_item.price * self.quantity
-
 
 class Cart(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
