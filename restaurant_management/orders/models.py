@@ -90,6 +90,7 @@ class Order(models.Model):
     def __str__(self):
         return f"Order #{self.id} by {self.customer.username}"
     
+    @property
     def calculate_total(self) -> Decimal:
         """
         Calculate the total cost of all items in this order.
@@ -98,7 +99,7 @@ class Order(models.Model):
         total = sum((item.item_total for item in self.order_items.all()), Decimal("0.00"))
         self.total_amount = total
         return total
-    
+    @property
     def save(self, *args, **kwargs):
         # Auto-update total before saving
         self.calculate_total()
