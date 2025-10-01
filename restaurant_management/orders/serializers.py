@@ -18,14 +18,13 @@ class OrderItemSerializer(serializers.ModelSerializer):
     def get_item_total(self, obj):
         return obj.get_item_total()
 
-class OrderSerializer(serializers.ModelSerializer):
-    order_items = OrderItemSerializer(many=True, read_only=True)
-    customer_name = serializers.CharField(source="customer.username", read_only=True)
-    order_status = serializers.CharField(source="order_status.name", read_only=True)
 
+class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ["id", "customer_name", "total_amount", "order_status", "created_at", "order_items"]
+        fields = ["id", "customer", "total_amount", "order_status", "created_at"]
+        read_only_fields = ["id", "customer", "total_amount", "created_at"]
+
 
 class OrderStatusSerializer(serializers.ModelSerializer):
     class Meta:

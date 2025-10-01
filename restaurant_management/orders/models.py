@@ -40,6 +40,10 @@ class OrderManager(models.Manager):
         """Retrieve only active orders easily via manager method."""
         return self.get_queryset().active()
 
+from decimal import Decimal
+from django.db import models
+from django.contrib.auth.models import User
+
 class Order(models.Model):
     """
     Stores a single order placed by a customer.
@@ -52,7 +56,6 @@ class Order(models.Model):
         ("Cancelled", "Cancelled"),
     ]
 
-    # Foreign key to the customer (User who placed the order)
     customer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -60,50 +63,44 @@ class Order(models.Model):
         help_text="The customer who placed the order"
     )
 
-    # Total price of all items in this order
     total_amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        default=0.00,
+        default=Decimal("0.00"),
         help_text="Total amount for this order"
     )
 
-    # Status of the order, linked to OrderStatus
-    order_status = models.ForeignKey(
-        OrderStatus,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="orders",  # 🔹 added related_name for clarity
-        default=None,
+    order_status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="Pending",
         help_text="Current status of the order"
     )
 
-    # Timestamp of when the order was created
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        help_text="Date and time when the order was created"
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    # Assign custom manager
-    objects = OrderManager()
+    objects = models.Manager()  # replace OrderManager() if custom manager not needed
 
     def __str__(self):
         return f"Order #{self.id} by {self.customer.username}"
-    
-    @property
+
     def calculate_total(self) -> Decimal:
         """
-        Calculate the total cost of all items in this order.
-        Updates the `total_amount` field and returns the computed total.
+        Calculates and updates the total amount of the order.
+        Loops through related order items and sums their totals.
         """
-        total = sum((item.item_total for item in self.order_items.all()), Decimal("0.00"))
+        total = sum(
+            (item.item_total for item in self.order_items.all()),
+            Decimal("0.00")
+        )
         self.total_amount = total
         return total
-    @property
+
     def save(self, *args, **kwargs):
-        # Auto-update total before saving
+        # Calculate total before saving
         self.calculate_total()
         super().save(*args, **kwargs)
+
 
 class OrderItem(models.Model):
     """
