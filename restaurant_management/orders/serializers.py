@@ -18,7 +18,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
     def get_item_total(self, obj):
         return obj.get_item_total()
 
-
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order

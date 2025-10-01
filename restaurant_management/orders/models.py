@@ -5,7 +5,7 @@ from django.utils import timezone
 from decimal import Decimal
 
 from products.models import MenuItem
-
+from .utils import generate_unique_order_id
 
 class OrderStatus(models.Model):
     """
@@ -40,14 +40,10 @@ class OrderManager(models.Manager):
         """Retrieve only active orders easily via manager method."""
         return self.get_queryset().active()
 
-from decimal import Decimal
-from django.db import models
-from django.contrib.auth.models import User
-
 class Order(models.Model):
     """
     Stores a single order placed by a customer.
-    Links to `User` for customer, and tracks status via `OrderStatus`.
+    Links to `User` for customer, and tracks status via OrderStatus.
     """
     STATUS_CHOICES = [
         ("Pending", "Pending"),
@@ -55,6 +51,14 @@ class Order(models.Model):
         ("Delivered", "Delivered"),
         ("Cancelled", "Cancelled"),
     ]
+
+    custom_order_id = models.CharField(
+        max_length=12,
+        unique=True,
+        editable=False,
+        null=True,  # temporarily allow null for migrations
+        help_text="Unique alphanumeric ID for the order"
+    )
 
     customer = models.ForeignKey(
         User,
@@ -79,27 +83,35 @@ class Order(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    objects = models.Manager()  # replace OrderManager() if custom manager not needed
+    objects = models.Manager()  # Use custom manager if needed
 
     def __str__(self):
-        return f"Order #{self.id} by {self.customer.username}"
+        return f"Order #{self.custom_order_id or self.id} by {self.customer.username}"
 
     def calculate_total(self) -> Decimal:
         """
-        Calculates and updates the total amount of the order.
-        Loops through related order items and sums their totals.
+        Calculates total only if the order has a primary key.
+        Avoids querying reverse FK on unsaved objects.
         """
-        total = sum(
-            (item.item_total for item in self.order_items.all()),
-            Decimal("0.00")
-        )
+        if not self.pk:
+            return Decimal("0.00")
+        total = sum((item.item_total for item in self.order_items.all()), Decimal("0.00"))
         self.total_amount = total
         return total
 
     def save(self, *args, **kwargs):
-        # Calculate total before saving
-        self.calculate_total()
+        # Assign a unique order ID if missing
+        if not self.custom_order_id:
+            self.custom_order_id = generate_unique_order_id()
+
+        # Save the order first to ensure PK exists for reverse FK
         super().save(*args, **kwargs)
+
+        # Recalculate total if there are order items
+        total = self.calculate_total()
+        if total != self.total_amount:
+            # Update total_amount without triggering infinite recursion
+            Order.objects.filter(pk=self.pk).update(total_amount=total)
 
 
 class OrderItem(models.Model):
