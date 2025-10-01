@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MenuCategory
+from .models import MenuCategory,Contact
 from products.models import MenuItem
 
 class MenuCategorySerializer(serializers.ModelSerializer):
@@ -20,3 +20,27 @@ class MenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
         fields = ["id", "name", "description", "price", "category", "image"]
+
+
+class ContactSerializer(serializers.ModelSerializer):
+    """
+    Serializer for handling contact form submissions.
+    Ensures proper validation and serialization of incoming data.
+    """
+
+    class Meta:
+        model = Contact
+        fields = ["id", "name", "email", "message", "submitted_at"]
+        read_only_fields = ["id", "submitted_at"]
+
+    def validate_name(self, value):
+        """Ensure name is not empty or only whitespace."""
+        if not value.strip():
+            raise serializers.ValidationError("Name cannot be blank.")
+        return value
+
+    def validate_message(self, value):
+        """Ensure message is not empty (if provided)."""
+        if value and not value.strip():
+            raise serializers.ValidationError("Message cannot be just whitespace.")
+        return value

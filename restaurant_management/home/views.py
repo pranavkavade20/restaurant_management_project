@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect
 from django.conf import settings
 from django.contrib import messages
-from django.core.mail import send_mail
+# from django.core.mail import send_mail
 from rest_framework.generics import ListAPIView
 from rest_framework import viewsets, filters
 from rest_framework.pagination import PageNumberPagination
@@ -13,16 +13,21 @@ from .forms import *
 from .models import MenuCategory
 from .serializers import MenuCategorySerializer,MenuItemSerializer
 
+from rest_framework import generics, status
+from rest_framework.response import Response
+from .models import Contact
+from .serializers import ContactSerializer
+
 # Display Restaurant name
 def homepage_view(request):
-    # Contact form on homepage
-    if request.method == "POST":
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("home")  # replace with your url name for homepage
-    else:
-        form = ContactForm()
+    # # Contact form on homepage
+    # if request.method == "POST":
+    #     form = ContactForm(request.POST)
+    #     if form.is_valid():
+    #         form.save()
+    #         return redirect("home")  # replace with your url name for homepage
+    # else:
+    #     form = ContactForm()
     
     # Search code
     query = request.GET.get("q", "")
@@ -61,42 +66,42 @@ def trigger_404(request):
 def about_view(request):
     return render(request, 'about.html')
 
-def contact(request):
-    success = False
-    if request.method == "POST":
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            contact = form.save()  # store in DB too
+# def contact(request):
+#     success = False
+#     if request.method == "POST":
+#         form = ContactForm(request.POST)
+#         if form.is_valid():
+#             contact = form.save()  # store in DB too
 
-            # Send email notification
-            subject = f"📩 New Contact Message from {contact.name}"
-            message = f"""
-                            You have received a new contact form submission.
+#             # Send email notification
+#             subject = f"📩 New Contact Message from {contact.name}"
+#             message = f"""
+#                             You have received a new contact form submission.
 
-                            Name: {contact.name}
-                            Email: {contact.email}
-                            Message:{contact.message}
+#                             Name: {contact.name}
+#                             Email: {contact.email}
+#                             Message:{contact.message}
 
-                            -- Swaadify Contact Form
-                            """
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                [settings.RESTAURANT_EMAIL],
-                fail_silently=False,
-            )
+#                             -- Swaadify Contact Form
+#                             """
+#             send_mail(
+#                 subject,
+#                 message,
+#                 settings.DEFAULT_FROM_EMAIL,
+#                 [settings.RESTAURANT_EMAIL],
+#                 fail_silently=False,
+#             )
 
-            success = True
-            return redirect("contact")  # redirect to clear form
-    else:
-        form = ContactForm()
+#             success = True
+#             return redirect("contact")  # redirect to clear form
+#     else:
+#         form = ContactForm()
 
-    return render(request, "contact.html", {
-        "form": form,
-        "restaurant_name": "Swaadify",
-        "success": success
-    })
+#     return render(request, "contact.html", {
+#         "form": form,
+#         "restaurant_name": "Swaadify",
+#         "success": success
+#     })
 
 # Reservation page
 def reservations(request):
@@ -141,3 +146,25 @@ class MenuItemViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = MenuItemPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ["name"]
+
+class Contact(generics.CreateAPIView):
+    """
+    API endpoint to handle contact form submissions.
+    Accepts POST requests with name, email, and message.
+    Stores submissions in the database after validation.
+    """
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        return Response(
+            {
+                "message": "Your contact form has been submitted successfully.",
+                "data": serializer.data,
+            },
+            status=status.HTTP_201_CREATED,
+        )
