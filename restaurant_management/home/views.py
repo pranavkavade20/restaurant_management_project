@@ -168,3 +168,26 @@ class Contact(generics.CreateAPIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+from .utils import send_email_async
+
+async def contact_view(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+
+        subject = f"New Contact Message from {name}"
+        body = f"Name: {name}\nEmail: {email}\nMessage: {message}"
+        recipient = ['admin@example.com']  # Your admin/support email
+
+        email_sent = await send_email_async(subject, body, recipient)
+
+        if email_sent:
+            return render(request, 'home/contact_success.html')
+        else:
+            return render(request, 'home/contact_failure.html')
+
+    return render(request, 'home/contact.html')
+
