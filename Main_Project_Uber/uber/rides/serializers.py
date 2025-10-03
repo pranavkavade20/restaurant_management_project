@@ -10,6 +10,9 @@ from datetime import timedelta
 # Local modules.
 from .models import Ride, RideFeedback
 
+from accounts.models import Rider,Driver
+from utils.geo_utils import calculate_distance
+
 class RideSerializer(serializers.ModelSerializer):
     """
     Serializer for displaying Ride instances (for drivers and riders).
@@ -314,3 +317,43 @@ class DriverEarningsSummarySerializer(serializers.Serializer):
             "payment_breakdown": breakdown_dict,
             "average_fare": average_fare,
         })
+
+
+
+class NearbyDriverSerializer(serializers.Serializer):
+    driver_id = serializers.IntegerField()
+    name = serializers.CharField()
+    distance_km = serializers.FloatField()
+
+    @staticmethod
+    def get_nearby_drivers(latitude: float, longitude: float):
+        """
+        Get list of nearby drivers sorted by distance.
+        """
+        drivers = Driver.objects.filter(
+            availability_status=True,
+            current_latitude__isnull=False,
+            current_longitude__isnull=False,
+        )
+
+        driver_list = []
+        for driver in drivers:
+            distance = calculate_distance(
+                latitude,
+                longitude,
+                driver.current_latitude,
+                driver.current_longitude,
+            )
+
+            driver_list.append({
+                "driver_id": driver.id,
+                "name": driver.user.get_full_name() or driver.user.username,
+                "distance_km": round(distance, 2),
+            })
+
+        # Sort by distance
+        driver_list = sorted(driver_list, key=lambda x: x["distance_km"])
+
+        # ✅ Pass dict list directly to serializer
+        return NearbyDriverSerializer(driver_list, many=True).data
+

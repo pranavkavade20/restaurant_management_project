@@ -25,6 +25,7 @@ from .serializers import (
             FareCalculationSerializer,
             RidePaymentSerializer,
             DriverEarningsSummarySerializer,
+            NearbyDriverSerializer,
     ) 
 
 class RideRequestCreateView(generics.CreateAPIView):
@@ -468,3 +469,31 @@ class DriverEarningsSummaryView(APIView):
         driver = request.user.driver_profile  # Driver profile linked to User
         serializer = DriverEarningsSummarySerializer.build_summary(driver)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class NearbyDriversView(APIView):
+    """
+    API endpoint to find nearby available drivers sorted by distance.
+    """
+
+    def post(self, request):
+        latitude = request.data.get("latitude")
+        longitude = request.data.get("longitude")
+
+        if latitude is None or longitude is None:
+            return Response(
+                {"error": "Latitude and Longitude are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            latitude, longitude = float(latitude), float(longitude)
+        except ValueError:
+            return Response(
+                {"error": "Latitude and Longitude must be valid numbers"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        nearby_drivers = NearbyDriverSerializer.get_nearby_drivers(latitude, longitude)
+        return Response(nearby_drivers, status=status.HTTP_200_OK)
