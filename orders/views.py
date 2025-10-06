@@ -1,93 +1,117 @@
-# Built in models.
+# ==========================
+# Built-in & Third-Party Imports
+# ==========================
+from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from rest_framework.response import Response
-from rest_framework import status,permissions
-
-# Local models
-from .models import Cart, CartItem,Order
-from products.models import MenuItem
-from .serializers import OrderSerializer,OrderDetailSerializer
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from .models import Order
+from rest_framework.views import APIView
+
+# ==========================
+# Local Imports
+# ==========================
+from .models import Cart, CartItem, Order, Coupon
+from products.models import MenuItem
 from .serializers import OrderSerializer
+
+
+# ==========================
+# Web Views (Cart Operations)
+# ==========================
 
 @login_required
 def cart_view(request):
+    """Display the user's shopping cart."""
     cart, _ = Cart.objects.get_or_create(user=request.user)
     return render(request, "cart.html", {"cart": cart})
 
+
 @login_required
 def add_to_cart(request, item_id):
+    """Add a menu item to the user's cart."""
     cart, _ = Cart.objects.get_or_create(user=request.user)
     item = get_object_or_404(MenuItem, id=item_id)
-    ci, created = CartItem.objects.get_or_create(cart=cart, menu_item=item)
+
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, menu_item=item)
     if not created:
-        ci.quantity += 1
-    ci.save()
+        cart_item.quantity += 1
+    cart_item.save()
+
     return redirect("cart")
+
 
 @login_required
 def update_cart(request, item_id):
+    """Update the quantity of a cart item or remove it if quantity is zero."""
     cart, _ = Cart.objects.get_or_create(user=request.user)
-    ci = get_object_or_404(CartItem, cart=cart, menu_item_id=item_id)
+    cart_item = get_object_or_404(CartItem, cart=cart, menu_item_id=item_id)
+
     if request.method == "POST":
-        qty = int(request.POST.get("quantity", 1))
+        try:
+            qty = int(request.POST.get("quantity", 1))
+        except ValueError:
+            qty = 1
+
         if qty > 0:
-            ci.quantity = qty
-            ci.save()
+            cart_item.quantity = qty
+            cart_item.save()
         else:
-            ci.delete()
+            cart_item.delete()
+
     return redirect("cart")
+
 
 @login_required
 def remove_from_cart(request, item_id):
+    """Remove an item from the user's cart."""
     cart, _ = Cart.objects.get_or_create(user=request.user)
-    ci = get_object_or_404(CartItem, cart=cart, menu_item_id=item_id)
-    ci.delete()
+    cart_item = get_object_or_404(CartItem, cart=cart, menu_item_id=item_id)
+    cart_item.delete()
     return redirect("cart")
+
+
+# ==========================
+# API Views (Orders & Coupons)
+# ==========================
 
 class OrderViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing customer orders.
-    Provides list, retrieve, and custom actions like cancel.
+    Provides list, retrieve, create, and cancel functionality.
     """
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         """
-        Customers only see their own orders.
-        Staff/Admins can see all orders.
+        Customers see only their own orders.
+        Staff/Admins see all orders.
         """
         user = self.request.user
-        if user.is_staff:
-            return Order.objects.all().order_by("-created_at")
-        return Order.objects.filter(customer=user).order_by("-created_at")
+        return (
+            Order.objects.all().order_by("-created_at")
+            if user.is_staff
+            else Order.objects.filter(customer=user).order_by("-created_at")
+        )
 
-    # 🔹 History = just "list" for current user
     @action(detail=False, methods=["get"], url_path="history")
     def history(self, request):
-        """
-        Retrieve logged-in user's order history.
-        Staff gets all orders.
-        """
+        """Return the logged-in user's order history."""
         orders = self.get_queryset()
         serializer = self.get_serializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # 🔹 Cancel order
     @action(detail=True, methods=["delete"], url_path="cancel")
     def cancel_order(self, request, pk=None):
         """
         Cancel an order by setting its status to 'Cancelled'.
+        Only the owner or staff can perform this action.
         """
         order = get_object_or_404(Order, pk=pk)
 
-        # Permission check: only owner or staff
+        # Authorization check
         if order.customer != request.user and not request.user.is_staff:
             return Response(
                 {"detail": "You do not have permission to cancel this order."},
@@ -100,72 +124,67 @@ class OrderViewSet(viewsets.ModelViewSet):
                 {"detail": "Order is already cancelled."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
         if order.order_status == "Delivered":
             return Response(
                 {"detail": "Delivered orders cannot be cancelled."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Update status
+        # Perform cancellation
         order.order_status = "Cancelled"
-        order.save()
+        order.save(update_fields=["order_status"])
 
         return Response(
             {"detail": f"Order #{order.id} has been cancelled successfully."},
             status=status.HTTP_200_OK,
         )
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.utils import timezone
-from .models import Coupon
 
 class CouponValidationView(APIView):
     """
     API endpoint to validate a coupon code.
+    Returns coupon details if valid, with proper error handling.
     """
 
     def post(self, request, *args, **kwargs):
-        code = request.data.get("code")
+        code = request.data.get("code", "").strip()
 
-        # Ensure code is provided
         if not code:
             return Response(
                 {"detail": "Coupon code is required."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        try:
-            coupon = Coupon.objects.get(code__iexact=code)
-        except Coupon.DoesNotExist:
+        coupon = Coupon.objects.filter(code__iexact=code).first()
+        if not coupon:
             return Response(
                 {"detail": "Invalid coupon code."},
-                status=status.HTTP_404_NOT_FOUND
+                status=status.HTTP_404_NOT_FOUND,
             )
 
-        # Check active status
+        now = timezone.now()
+
+        # Validation checks
         if not coupon.is_active:
             return Response(
                 {"detail": "This coupon is no longer active."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Check date validity
-        now = timezone.now()
         if coupon.valid_from and coupon.valid_from > now:
             return Response(
                 {"detail": "This coupon is not yet valid."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if coupon.valid_to and coupon.valid_to < now:
             return Response(
                 {"detail": "This coupon has expired."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Coupon is valid — return discount info
+        # Valid coupon
         return Response(
             {
                 "success": True,
@@ -177,5 +196,5 @@ class CouponValidationView(APIView):
                     "valid_to": coupon.valid_to,
                 },
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
