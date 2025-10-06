@@ -115,3 +115,67 @@ class OrderViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK,
         )
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.utils import timezone
+from .models import Coupon
+
+class CouponValidationView(APIView):
+    """
+    API endpoint to validate a coupon code.
+    """
+
+    def post(self, request, *args, **kwargs):
+        code = request.data.get("code")
+
+        # Ensure code is provided
+        if not code:
+            return Response(
+                {"detail": "Coupon code is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            coupon = Coupon.objects.get(code__iexact=code)
+        except Coupon.DoesNotExist:
+            return Response(
+                {"detail": "Invalid coupon code."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Check active status
+        if not coupon.is_active:
+            return Response(
+                {"detail": "This coupon is no longer active."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check date validity
+        now = timezone.now()
+        if coupon.valid_from and coupon.valid_from > now:
+            return Response(
+                {"detail": "This coupon is not yet valid."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if coupon.valid_to and coupon.valid_to < now:
+            return Response(
+                {"detail": "This coupon has expired."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Coupon is valid — return discount info
+        return Response(
+            {
+                "success": True,
+                "message": "Coupon is valid.",
+                "data": {
+                    "code": coupon.code,
+                    "discount": float(coupon.discount),
+                    "valid_from": coupon.valid_from,
+                    "valid_to": coupon.valid_to,
+                },
+            },
+            status=status.HTTP_200_OK
+        )

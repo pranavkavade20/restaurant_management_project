@@ -174,6 +174,7 @@ class CartItem(models.Model):
     def subtotal(self):
         return self.menu_item.price * self.quantity
 
+# Coupon model
 class Coupon(models.Model):
     """
     Represents discount coupons used in orders.
