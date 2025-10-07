@@ -4,6 +4,7 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 import logging
 import asyncio
+from datetime import datetime, time
 
 logger = logging.getLogger(__name__)
 
@@ -31,3 +32,38 @@ async def send_email_async(subject: str, body: str, recipient_list: list, from_e
     except Exception as e:
         logger.error(f"Failed to send email to {recipient_list}: {e}")
         return False
+
+
+def is_restaurant_open() -> bool:
+    """
+    Check if the restaurant is currently open based on predefined operating hours.
+
+    Returns:
+        bool: True if the restaurant is open, False otherwise.
+    """
+    # Get current day (0=Monday, 6=Sunday) and current time
+    now = datetime.now()
+    current_day = now.weekday()
+    current_time = now.time()
+
+    # Define operating hours
+    # Example: Open 9:00 AM to 10:00 PM (same hours every day)
+    opening_hours = {
+        0: (time(9, 0), time(22, 0)),  # Monday
+        1: (time(9, 0), time(22, 0)),  # Tuesday
+        2: (time(9, 0), time(22, 0)),  # Wednesday
+        3: (time(9, 0), time(22, 0)),  # Thursday
+        4: (time(9, 0), time(22, 0)),  # Friday
+        5: (time(10, 0), time(23, 0)), # Saturday
+        6: (time(10, 0), time(22, 0)), # Sunday
+    }
+
+    # Get today's open and close time
+    open_time, close_time = opening_hours.get(current_day, (None, None))
+
+    # If no hours defined, restaurant is closed
+    if not open_time or not close_time:
+        return False
+
+    # Check if current time is within operating hours
+    return open_time <= current_time <= close_time
