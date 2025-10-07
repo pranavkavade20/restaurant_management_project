@@ -52,4 +52,5 @@ class TableSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Table
-        fields = ["table_number", "capacity", "is_available"]
+        fields = ["id", "table_number", "capacity", "is_available"]
+

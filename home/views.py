@@ -170,3 +170,33 @@ class AvailableTablesAPIView(generics.ListAPIView):
     """
     queryset = Table.objects.filter(is_available=True).order_by("table_number")
     serializer_class = TableSerializer
+
+
+class TableListAPIView(generics.ListAPIView):
+    """
+    API view to list all tables in the restaurant.
+    """
+    queryset = Table.objects.all().order_by("id")
+    serializer_class = TableSerializer
+
+
+class TableDetailAPIView(generics.RetrieveAPIView):
+    """
+    API view to retrieve details of a single table by ID.
+    """
+    queryset = Table.objects.all()
+    serializer_class = TableSerializer
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handles GET request for retrieving a specific table.
+        """
+        try:
+            table = self.get_object()
+            serializer = self.get_serializer(table)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Table.DoesNotExist:
+            return Response(
+                {"detail": "Table not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
