@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MenuCategory,Contact
+from .models import MenuCategory,Contact,Table
 from products.models import MenuItem
 
 class MenuCategorySerializer(serializers.ModelSerializer):
@@ -44,3 +44,12 @@ class ContactSerializer(serializers.ModelSerializer):
         if value and not value.strip():
             raise serializers.ValidationError("Message cannot be just whitespace.")
         return value
+
+class TableSerializer(serializers.ModelSerializer):
+    """
+    Serializer for restaurant tables.
+    Exposes basic table details for availability checks.
+    """
+    class Meta:
+        model = Table
+        fields = ["table_number", "capacity", "is_available"]

@@ -11,6 +11,7 @@ from .views import (
     MenuCategoryListView,
     MenuItemViewSet,
     ContactCreateAPIView,
+    AvailableTablesAPIView,
 )
 
 # DRF Router for ViewSets
@@ -30,7 +31,8 @@ urlpatterns = [
     path("404-test/", custom_404_view, name="trigger_404"),
 
     # API Endpoints
+    path("api/", include(router.urls)),
     path("api/categories/", MenuCategoryListView.as_view(), name="menu-category-list"),
     path("api/contact/", ContactCreateAPIView.as_view(), name="api-contact"),
-    path("api/", include(router.urls)),
+    path("api/tables/available/", AvailableTablesAPIView.as_view(), name="available_tables_api"),
 ]

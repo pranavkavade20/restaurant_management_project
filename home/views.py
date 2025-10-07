@@ -12,11 +12,10 @@ from rest_framework.generics import ListAPIView
 # Local modules
 from .forms import ContactForm, FeedbackForm
 from .models import MenuCategory, Contact
-from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer
+from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer
 from .utils import send_email_async
 from products.models import MenuItem
-from .models import Restaurant  # assuming Restaurant model exists
-
+from .models import Restaurant, Table  
 
 # ==========================
 # Web Views
@@ -163,3 +162,11 @@ class ContactCreateAPIView(generics.CreateAPIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+class AvailableTablesAPIView(generics.ListAPIView):
+    """
+    API endpoint to list currently available tables.
+    Only returns tables where is_available=True.
+    """
+    queryset = Table.objects.filter(is_available=True).order_by("table_number")
+    serializer_class = TableSerializer

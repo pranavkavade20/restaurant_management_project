@@ -1,15 +1,22 @@
+# home/models.py
 from django.db import models
 from multiselectfield import MultiSelectField
-# Feedback model
+
+
+# ------------------------
+# Feedback Model
+# ------------------------
 class Feedback(models.Model):
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        # Show first 40 chars in admin/listing
         return self.comment[:40] or "Feedback"
 
-# Contact us model for user.
+
+# ------------------------
+# Contact Model
+# ------------------------
 class Contact(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -19,24 +26,25 @@ class Contact(models.Model):
     def __str__(self):
         return f"{self.name} ({self.email})"
 
-# Restaurant Address
+
+# ------------------------
+# Address Model
+# ------------------------
 class Address(models.Model):
-    address = models.CharField(max_length=255)   # Street address
+    address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
-    zip_code = models.CharField(max_length=10)   
-    # Kept as CharField to allow codes like "02115" or "12345-6789"
+    zip_code = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return f"{self.address}, {self.city}, {self.state} {self.zip_code}"
 
-# Restaurant model
 
+# ------------------------
+# Restaurant Model
+# ------------------------
 class Restaurant(models.Model):
-    # ------------------------
-    # Basic restaurant details
-    # ------------------------
     name = models.CharField(max_length=200, help_text="Name of the restaurant")
     phone = models.CharField(max_length=15, help_text="Contact number")
     address = models.OneToOneField(
@@ -47,15 +55,8 @@ class Restaurant(models.Model):
         help_text="One-to-one mapping with Address"
     )
 
-    # ------------------------
-    # Opening hours per day
-    # Example: {"Monday": "9 AM - 10 PM", "Tuesday": "Closed"}
-    # ------------------------
     opening_hours = models.JSONField(default=dict, blank=True)
 
-    # ------------------------
-    # Operating days (business days)
-    # ------------------------
     DAYS_OF_WEEK = (
         ("Mon", "Monday"),
         ("Tue", "Tuesday"),
@@ -77,7 +78,9 @@ class Restaurant(models.Model):
         return self.name
 
 
-# MenuCategoru model
+# ------------------------
+# Menu Category Model
+# ------------------------
 class MenuCategory(models.Model):
     """
     Represents categories for the restaurant's menu 
@@ -86,14 +89,30 @@ class MenuCategory(models.Model):
     name = models.CharField(
         max_length=100,
         unique=True,
-        db_index=True,  # Improves lookup performance
+        db_index=True,
         verbose_name="Category Name"
     )
 
     class Meta:
         verbose_name = "Menu Category"
         verbose_name_plural = "Menu Categories"
-        ordering = ["name"]  # Sort categories alphabetically
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
+
+
+# ------------------------
+# Table Model (NEW)
+# ------------------------
+class Table(models.Model):
+    """
+    Represents a dining table in the restaurant.
+    Used for reservation and availability tracking.
+    """
+    table_number = models.PositiveIntegerField(unique=True)
+    capacity = models.PositiveIntegerField(help_text="Number of people the table can seat")
+    is_available = models.BooleanField(default=True, help_text="Whether the table is currently available")
+
+    def __str__(self):
+        return f"Table {self.table_number} (Seats {self.capacity})"
