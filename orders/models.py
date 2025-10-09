@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from decimal import Decimal
 from products.models import MenuItem
-from .utils import generate_unique_order_id
+from .utils import generate_unique_order_id, calculate_discount
 
 
 class OrderStatus(models.Model):
@@ -89,6 +89,7 @@ class OrderManager(models.Manager):
         return self.get_queryset().active()
 
 
+# Order model
 class Order(models.Model):
     """
     Stores a single order placed by a customer.
@@ -138,15 +139,48 @@ class Order(models.Model):
     def __str__(self):
         return f"Order #{self.custom_order_id or self.id} by {self.customer.username}"
 
-    def calculate_total(self) -> Decimal:
+    def calculate_total(self, coupon=None, apply_coupon: bool = True) -> Decimal:
         """
-        Calculates total only if the order has a primary key.
-        Avoids querying reverse FK on unsaved objects.
+        Calculate the total price of the order by summing its order_items,
+        then applying an order-level discount (if provided or attached).
+
+        Args:
+            coupon: Optional - Coupon instance or coupon code string to apply.
+                    If None and the Order has an attribute 'coupon', that will be used.
+            apply_coupon: If False, do not apply any discount.
+
+        Returns:
+            Decimal: Final total amount after discounts (rounded to 2 decimals).
         """
+        # Avoid calculating for unsaved Order without PK (no FK items)
         if not self.pk:
             return Decimal("0.00")
-        total = sum((item.item_total for item in self.order_items.all()), Decimal("0.00"))
+
+        # Sum item totals (menu item price * quantity)
+        subtotal = sum(
+            (item.item_total for item in self.order_items.all()),
+            Decimal("0.00"),
+        )
+
+        # Determine coupon to use
+        coupon_to_use = coupon
+        if apply_coupon and coupon_to_use is None:
+            # If Order has a coupon FK/attribute, prefer that
+            coupon_to_use = getattr(self, "coupon", None)
+
+        discount_amount = Decimal("0.00")
+        if apply_coupon and coupon_to_use:
+            try:
+                discount_amount = calculate_discount(subtotal, coupon=coupon_to_use)
+            except Exception:
+                # On any error during discount calc, fall back to zero discount
+                discount_amount = Decimal("0.00")
+
+        total = (subtotal - discount_amount).quantize(Decimal("0.01"))
+
+        # Update model field (but do not auto-save here to avoid side effects)
         self.total_amount = total
+
         return total
 
     def save(self, *args, **kwargs):
