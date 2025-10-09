@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib import messages
 
 # Django REST Framework modules
-from rest_framework import viewsets, generics, status, filters
+from rest_framework import viewsets, generics, status, filters, permissions
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
@@ -12,7 +12,7 @@ from rest_framework.generics import ListAPIView
 # Local modules
 from .forms import ContactForm, FeedbackForm
 from .models import MenuCategory, Contact
-from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer
+from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer,DailySpecialSerializer
 from .utils import send_email_async
 from products.models import MenuItem
 from .models import Restaurant, Table  
@@ -200,3 +200,18 @@ class TableDetailAPIView(generics.RetrieveAPIView):
                 {"detail": "Table not found."},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+
+class DailySpecialsAPIView(generics.ListAPIView):
+    """
+    API endpoint to list all daily special menu items.
+    """
+    serializer_class = DailySpecialSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        """
+        Return only menu items marked as daily specials.
+        """
+        return MenuItem.objects.filter(is_daily_special=True).order_by("name")

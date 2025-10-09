@@ -54,3 +54,12 @@ class TableSerializer(serializers.ModelSerializer):
         model = Table
         fields = ["id", "table_number", "capacity", "is_available"]
 
+class DailySpecialSerializer(serializers.ModelSerializer):
+    """
+    Serializer for displaying menu items marked as daily specials.
+    """
+    category_name = serializers.CharField(source="category.name", read_only=True)
+
+    class Meta:
+        model = MenuItem
+        fields = ["id", "name", "description", "price", "image", "category_name"]

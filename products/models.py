@@ -9,8 +9,11 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-# Menu model
+
 class MenuItem(models.Model):
+    """
+    Represents a food or drink item available on the restaurant menu.
+    """
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
@@ -21,7 +24,13 @@ class MenuItem(models.Model):
         related_name="items"
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
+    # 🔹 New field for marking daily specials
+    is_daily_special = models.BooleanField(
+        default=False,
+        help_text="Mark this item as a daily special"
+    )
+
     class Meta:
         verbose_name = "Menu Item"
         verbose_name_plural = "Menu Items"
@@ -29,10 +38,3 @@ class MenuItem(models.Model):
 
     def __str__(self):
         return f"{self.name} --> {self.price}"
-
-
-
-
-
-
-    

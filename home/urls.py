@@ -14,6 +14,7 @@ from .views import (
     AvailableTablesAPIView,
     TableDetailAPIView,
     TableListAPIView,
+    DailySpecialsAPIView,
 )
 
 # DRF Router for ViewSets
@@ -37,6 +38,9 @@ urlpatterns = [
     path("api/categories/", MenuCategoryListView.as_view(), name="menu-category-list"),
     path("api/contact/", ContactCreateAPIView.as_view(), name="api-contact"),
     path("api/tables/available/", AvailableTablesAPIView.as_view(), name="available_tables_api"),
+
     path("api/tables/", TableListAPIView.as_view(), name="table-list"),
     path("api/tables/<int:pk>/", TableDetailAPIView.as_view(), name="table-detail"),
+     # 🔹 New Daily Specials API endpoint
+    path("api/daily-specials/", DailySpecialsAPIView.as_view(), name="daily_specials_api"),
 ]
