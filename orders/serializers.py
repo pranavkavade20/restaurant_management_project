@@ -38,3 +38,27 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ["id", "customer", "total_amount", "order_status", "created_at", "order_items"]
+        
+class OrderStatusUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for updating the status of an order.
+    """
+    order_id = serializers.IntegerField()
+    new_status = serializers.CharField(max_length=20)
+
+    def validate(self, data):
+        # Check if the order exists
+        try:
+            order = Order.objects.get(pk=data["order_id"])
+        except Order.DoesNotExist:
+            raise serializers.ValidationError({"order_id": "Invalid order ID."})
+
+        # Validate new status
+        valid_statuses = Order.valid_statuses()
+        if data["new_status"] not in valid_statuses:
+            raise serializers.ValidationError({
+                "new_status": f"Invalid status. Allowed values: {', '.join(valid_statuses)}"
+            })
+
+        data["order"] = order
+        return data

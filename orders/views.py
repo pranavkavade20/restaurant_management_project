@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 # ==========================
 from .models import Cart, CartItem, Order, Coupon
 from products.models import MenuItem
-from .serializers import OrderSerializer
+from .serializers import OrderSerializer,OrderStatusUpdateSerializer
 
 
 # ==========================
@@ -195,6 +195,38 @@ class CouponValidationView(APIView):
                     "valid_from": coupon.valid_from,
                     "valid_to": coupon.valid_to,
                 },
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class UpdateOrderStatusAPIView(APIView):
+    """
+    API endpoint to update an order's status.
+    Example request (POST):
+        {
+            "order_id": 1,
+            "new_status": "Delivered"
+        }
+    """
+
+    def post(self, request, *args, **kwargs):
+        serializer = OrderStatusUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        order = serializer.validated_data["order"]
+        new_status = serializer.validated_data["new_status"]
+
+        # Update the order status
+        order.order_status = new_status
+        order.save(update_fields=["order_status"])
+
+        return Response(
+            {
+                "success": True,
+                "message": f"Order #{order.custom_order_id or order.id} status updated to '{new_status}'.",
+                "order_id": order.id,
+                "new_status": new_status,
             },
             status=status.HTTP_200_OK,
         )
