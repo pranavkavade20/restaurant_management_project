@@ -1,11 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.conf import settings 
+from django.conf import settings
 from django.utils import timezone
 from decimal import Decimal
-
 from products.models import MenuItem
 from .utils import generate_unique_order_id
+
 
 class OrderStatus(models.Model):
     """
@@ -22,23 +22,72 @@ class OrderStatus(models.Model):
     class Meta:
         verbose_name = "Order Status"
         verbose_name_plural = "Order Statuses"
-        ordering = ["id"]  # preserve consistent creation order
+        ordering = ["id"]
 
     def __str__(self):
         return self.name
 
-class OrderQuerySet(models.QuerySet):
-    def active(self):
-        """Return only active orders (Pending / Processing)."""
-        return self.filter(order_status__name__in=["Pending", "Processing"])
 
+# ✅ Custom QuerySet for chaining and efficient querying
+class OrderQuerySet(models.QuerySet):
+    def by_status(self, status_name: str):
+        """Filter orders by a given status name (case-insensitive)."""
+        return self.filter(order_status__iexact=status_name)
+
+    def pending(self):
+        """Return all pending orders."""
+        return self.by_status("Pending")
+
+    def processing(self):
+        """Return all processing orders."""
+        return self.by_status("Processing")
+
+    def delivered(self):
+        """Return all delivered orders."""
+        return self.by_status("Delivered")
+
+    def cancelled(self):
+        """Return all cancelled orders."""
+        return self.by_status("Cancelled")
+
+    def active(self):
+        """Return active orders (Pending or Processing)."""
+        return self.filter(order_status__in=["Pending", "Processing"])
+
+
+# ✅ Custom Manager using OrderQuerySet
 class OrderManager(models.Manager):
+    """
+    Custom manager for the Order model providing
+    status-based and active order retrieval.
+    """
     def get_queryset(self):
         return OrderQuerySet(self.model, using=self._db)
 
+    def get_by_status(self, status_name: str):
+        """Retrieve all orders by a specific status."""
+        return self.get_queryset().by_status(status_name)
+
+    def get_pending_orders(self):
+        """Shortcut for pending orders."""
+        return self.get_queryset().pending()
+
+    def get_processing_orders(self):
+        """Shortcut for processing orders."""
+        return self.get_queryset().processing()
+
+    def get_delivered_orders(self):
+        """Shortcut for delivered orders."""
+        return self.get_queryset().delivered()
+
+    def get_cancelled_orders(self):
+        """Shortcut for cancelled orders."""
+        return self.get_queryset().cancelled()
+
     def get_active_orders(self):
-        """Retrieve only active orders easily via manager method."""
+        """Shortcut for active (Pending or Processing) orders."""
         return self.get_queryset().active()
+
 
 class Order(models.Model):
     """
@@ -56,7 +105,7 @@ class Order(models.Model):
         max_length=12,
         unique=True,
         editable=False,
-        null=True,  # temporarily allow null for migrations
+        null=True,
         help_text="Unique alphanumeric ID for the order"
     )
 
@@ -83,7 +132,8 @@ class Order(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    objects = models.Manager()  # Use custom manager if needed
+    # ✅ Attach the new custom manager here
+    objects = OrderManager()
 
     def __str__(self):
         return f"Order #{self.custom_order_id or self.id} by {self.customer.username}"
@@ -110,7 +160,6 @@ class Order(models.Model):
         # Recalculate total if there are order items
         total = self.calculate_total()
         if total != self.total_amount:
-            # Update total_amount without triggering infinite recursion
             Order.objects.filter(pk=self.pk).update(total_amount=total)
 
 
@@ -119,34 +168,27 @@ class OrderItem(models.Model):
     Represents an item within a specific Order.
     Links to a MenuItem and tracks quantity ordered.
     """
-    # The order this item belongs to
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
         related_name="order_items",
         help_text="The order this item belongs to"
     )
-
-    # The menu item being ordered
     menu_item = models.ForeignKey(
         MenuItem,
         on_delete=models.CASCADE,
         help_text="The menu item included in this order"
     )
-
-    # Quantity of this menu item in the order
-    quantity = models.PositiveIntegerField(
-        default=1,
-        help_text="Quantity of this menu item in the order"
-    )
+    quantity = models.PositiveIntegerField(default=1, help_text="Quantity of this menu item")
 
     def __str__(self):
         return f"{self.quantity} x {self.menu_item.name} (Order #{self.order.id})"
 
     @property
     def item_total(self):
-        """Return total price for this menu item (price * quantity)."""
+        """Return total price for this menu item."""
         return self.menu_item.price * self.quantity
+
 
 class Cart(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -162,6 +204,7 @@ class Cart(models.Model):
     def total_price(self):
         return sum(i.menu_item.price * i.quantity for i in self.items.all())
 
+
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name="items", on_delete=models.CASCADE)
     menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
@@ -174,7 +217,7 @@ class CartItem(models.Model):
     def subtotal(self):
         return self.menu_item.price * self.quantity
 
-# Coupon model
+
 class Coupon(models.Model):
     """
     Represents discount coupons used in orders.
