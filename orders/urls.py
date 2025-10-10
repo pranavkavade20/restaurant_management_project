@@ -8,6 +8,7 @@ from .views import (
     CouponValidationView,
     OrderViewSet,
     UpdateOrderStatusAPIView,
+    get_order_status,
 )
 
 # DRF Router for Orders API
@@ -29,4 +30,5 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("api/coupon/validate/", CouponValidationView.as_view(), name="coupon-validate"),
     path("update-status/",UpdateOrderStatusAPIView.as_view(), name="update_order_status_api"),
+    path("<int:order_id>/status/", get_order_status, name="get_order_status"),
 ]

@@ -5,10 +5,9 @@ from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, status, permissions
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 # ==========================
 # Local Imports
 # ==========================
@@ -230,3 +229,24 @@ class UpdateOrderStatusAPIView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+    
+@api_view(["GET"])
+def get_order_status(request, order_id):
+    """
+    Retrieve the current status of an order given its ID.
+    """
+    try:
+        order = Order.objects.get(pk=order_id)
+    except Order.DoesNotExist:
+        return Response(
+            {"error": f"Order with ID {order_id} not found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    return Response(
+        {
+            "order_id": order.id,
+            "status": order.order_status,
+        },
+        status=status.HTTP_200_OK,
+    )
