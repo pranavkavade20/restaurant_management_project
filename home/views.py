@@ -7,7 +7,6 @@ from django.contrib import messages
 from rest_framework import viewsets, generics, status, filters, permissions
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.generics import ListAPIView
 
 # Local modules
 from .forms import ContactForm, FeedbackForm
@@ -16,7 +15,6 @@ from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSeri
 from .utils import send_email_async
 from products.models import MenuItem
 from .models import Restaurant, Table  
-
 # ==========================
 # Web Views
 # ==========================
@@ -115,15 +113,45 @@ def custom_404_view(request, exception=None):
     """Custom 404 error handler."""
     return render(request, "404.html", status=404)
 
-
-# ==========================
 # API Views
-# ==========================
 
-class MenuCategoryListView(ListAPIView):
-    """API endpoint to list all menu categories."""
-    queryset = MenuCategory.objects.all().order_by('name')
+
+class MenuCategoryViewSet(viewsets.ModelViewSet):
+    """
+    API ViewSet to handle CRUD operations for MenuCategory.
+    Supports: list, retrieve, create, update, partial_update, delete.
+    """
+    queryset = MenuCategory.objects.all().order_by("name")
     serializer_class = MenuCategorySerializer
+    lookup_field = "id"
+
+    def create(self, request, *args, **kwargs):
+        """Handle category creation with clean response."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(
+            {"message": "Menu category created successfully", "data": serializer.data},
+            status=status.HTTP_201_CREATED
+        )
+
+    def update(self, request, *args, **kwargs):
+        """Handle category updates with validation."""
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(
+            {"message": "Menu category updated successfully", "data": serializer.data},
+            status=status.HTTP_200_OK
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        """Handle category deletion safely."""
+        instance = self.get_object()
+        instance.delete()
+        return Response({"message": "Menu category deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 
 class MenuItemPagination(PageNumberPagination):
@@ -140,6 +168,7 @@ class MenuItemViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = MenuItemPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ["name"]
+
 
 
 class ContactCreateAPIView(generics.CreateAPIView):
@@ -200,8 +229,6 @@ class TableDetailAPIView(generics.RetrieveAPIView):
                 {"detail": "Table not found."},
                 status=status.HTTP_404_NOT_FOUND
             )
-
-
 
 class DailySpecialsAPIView(generics.ListAPIView):
     """

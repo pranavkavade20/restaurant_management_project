@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import MenuCategory,Contact,Table
+from .models import MenuCategory, Contact,Table
 from products.models import MenuItem
+
 
 class MenuCategorySerializer(serializers.ModelSerializer):
     """
@@ -8,18 +9,18 @@ class MenuCategorySerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = MenuCategory
-        fields = ['id', 'name']  # expose id for frontend mapping
+        fields = ["id", "name"]  # Include ID for frontend mapping
+
 
 class MenuItemSerializer(serializers.ModelSerializer):
     """
-    Serializer for MenuItem model.
+    Serializer for MenuItem model (optional if already exists elsewhere).
     """
-    category = serializers.StringRelatedField()
-    image = serializers.ImageField(read_only=True)
+    category = MenuCategorySerializer(read_only=True)
 
     class Meta:
         model = MenuItem
-        fields = ["id", "name", "description", "price", "category", "image"]
+        fields = ["id", "name", "description", "price", "image", "category", "created_at"]
 
 
 class ContactSerializer(serializers.ModelSerializer):

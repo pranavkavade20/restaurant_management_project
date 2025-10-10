@@ -8,7 +8,7 @@ from .views import (
     reservations_view,
     feedback_view,
     custom_404_view,
-    MenuCategoryListView,
+    MenuCategoryViewSet,
     MenuItemViewSet,
     ContactCreateAPIView,
     AvailableTablesAPIView,
@@ -20,7 +20,7 @@ from .views import (
 # DRF Router for ViewSets
 router = DefaultRouter()
 router.register(r"menu-items", MenuItemViewSet, basename="menu-items")
-
+router.register(r'categories', MenuCategoryViewSet, basename='menu-category')
 urlpatterns = [
     # Web Views
     path("", homepage_view, name="home"),
@@ -35,7 +35,7 @@ urlpatterns = [
 
     # API Endpoints
     path("api/", include(router.urls)),
-    path("api/categories/", MenuCategoryListView.as_view(), name="menu-category-list"),
+    
     path("api/contact/", ContactCreateAPIView.as_view(), name="api-contact"),
     path("api/tables/available/", AvailableTablesAPIView.as_view(), name="available_tables_api"),
 
