@@ -1,12 +1,9 @@
 # orders/utils.py
-import string
-import secrets
+import string , secrets, logging
 from datetime import date
 from decimal import Decimal
 from django.db.models import Sum
-from django.utils import timezone
-
-
+from django.core.exceptions import ObjectDoesNotExist
 # -------------------------
 # Coupon code utility
 # -------------------------
@@ -112,3 +109,40 @@ def calculate_discount(amount: Decimal, coupon=None) -> Decimal:
     if discount_amount > amount:
         return amount
     return discount_amount
+
+# Initialize logger for this module
+logger = logging.getLogger(__name__)
+
+def update_order_status(order_id: int, new_status: str) -> dict:
+    """
+    Reusable utility function to update the status of an order.
+    
+    Args:
+        order_id (int): The ID of the order to update.
+        new_status (str): The new status to set (e.g., 'pending', 'processing', 'completed', 'cancelled').
+
+    Returns:
+        dict: A dictionary containing the result and message.
+              Example: {"success": True, "message": "Order status updated to completed"}
+    """
+    from . models import Order
+    try:
+        order = Order.objects.get(pk=order_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"Attempted to update status for non-existent order ID: {order_id}")
+        return {"success": False, "message": f"Order with ID {order_id} not found."}
+
+    # Validate that the new status is valid
+    valid_statuses = [choice[0] for choice in Order.STATUS_CHOICES]
+    if new_status not in valid_statuses:
+        logger.error(f"Invalid status '{new_status}' provided for Order ID {order_id}.")
+        return {"success": False, "message": f"Invalid status. Allowed values: {', '.join(valid_statuses)}"}
+
+    # Update and save the new status
+    old_status = order.order_status
+    order.order_status = new_status
+    order.save(update_fields=["status"])
+
+    logger.info(f"Order ID {order_id} status changed from '{old_status}' to '{new_status}'.")
+
+    return {"success": True, "message": f"Order status updated to '{new_status}'."}
