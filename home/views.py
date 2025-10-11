@@ -2,19 +2,22 @@
 from django.shortcuts import render, redirect
 from django.conf import settings
 from django.contrib import messages
+from django.shortcuts import get_object_or_404
 
 # Django REST Framework modules
 from rest_framework import viewsets, generics, status, filters, permissions
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 # Local modules
 from .forms import ContactForm, FeedbackForm
 from .models import MenuCategory, Contact
-from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer,DailySpecialSerializer
+from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer,DailySpecialSerializer,UserReviewSerializer
 from .utils import send_email_async
 from products.models import MenuItem
-from .models import Restaurant, Table  
+from .models import Restaurant, Table, UserReview
+
 # ==========================
 # Web Views
 # ==========================
@@ -242,3 +245,40 @@ class DailySpecialsAPIView(generics.ListAPIView):
         Return only menu items marked as daily specials.
         """
         return MenuItem.objects.filter(is_daily_special=True).order_by("name")
+
+
+class UserReviewCreateView(generics.CreateAPIView):
+    """
+    API endpoint to allow authenticated users to create reviews for menu items.
+    """
+    serializer_class = UserReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def post(self, request, *args, **kwargs):
+        menu_item_id = self.kwargs.get("menu_item_id")
+        menu_item = get_object_or_404(MenuItem, id=menu_item_id)
+
+        # Check if the user already reviewed this item
+        if UserReview.objects.filter(user=request.user, menu_item=menu_item).exists():
+            return Response(
+                {"detail": "You have already reviewed this menu item."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user, menu_item=menu_item)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class MenuItemReviewListView(generics.ListAPIView):
+    """
+    API endpoint to retrieve all reviews for a specific menu item.
+    """
+    serializer_class = UserReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        menu_item_id = self.kwargs.get("menu_item_id")
+        return UserReview.objects.filter(menu_item_id=menu_item_id).select_related("user", "menu_item").order_by("-review_date")

@@ -1,7 +1,6 @@
 from rest_framework import serializers
-from .models import MenuCategory, Contact,Table
+from .models import MenuCategory, Contact,Table,UserReview
 from products.models import MenuItem
-
 
 class MenuCategorySerializer(serializers.ModelSerializer):
     """
@@ -64,3 +63,25 @@ class DailySpecialSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
         fields = ["id", "name", "description", "price", "image", "category_name"]
+
+
+
+
+class UserReviewSerializer(serializers.ModelSerializer):
+    """
+    Serializer for UserReview model.
+    Handles serialization and validation for user-submitted reviews.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)  # show username instead of ID
+    menu_item = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = UserReview
+        fields = ["id", "user", "menu_item", "rating", "comment", "review_date"]
+
+    def validate_rating(self, value):
+        """Ensure the rating is between 1 and 5."""
+        if not 1 <= value <= 5:
+            raise serializers.ValidationError("Rating must be between 1 and 5.")
+        return value

@@ -15,6 +15,8 @@ from .views import (
     TableDetailAPIView,
     TableListAPIView,
     DailySpecialsAPIView,
+    UserReviewCreateView,
+    MenuItemReviewListView
 )
 
 # DRF Router for ViewSets
@@ -43,4 +45,18 @@ urlpatterns = [
     path("api/tables/<int:pk>/", TableDetailAPIView.as_view(), name="table-detail"),
      # 🔹 New Daily Specials API endpoint
     path("api/daily-specials/", DailySpecialsAPIView.as_view(), name="daily_specials_api"),
+
+     # Create a new review for a specific menu item
+    path(
+        "api/menu/<int:menu_item_id>/reviews/add/",
+        UserReviewCreateView.as_view(),
+        name="add_menu_item_review"
+    ),
+
+    # Get all reviews for a specific menu item
+    path(
+        "api/menu/<int:menu_item_id>/reviews/",
+        MenuItemReviewListView.as_view(),
+        name="menu_item_reviews"
+    ),
 ]
