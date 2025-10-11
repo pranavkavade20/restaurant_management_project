@@ -1,6 +1,7 @@
-# home/models.py
 from django.db import models
 from multiselectfield import MultiSelectField
+from django.contrib.auth.models import User
+from products.models import MenuItem
 
 
 # ------------------------
@@ -116,3 +117,50 @@ class Table(models.Model):
 
     def __str__(self):
         return f"Table {self.table_number} (Seats {self.capacity})"
+
+
+class UserReview(models.Model):
+    """
+    Stores user reviews for specific menu items.
+    Each review is linked to a user and a menu item.
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        help_text="The user who submitted this review"
+    )
+
+    menu_item = models.ForeignKey(
+        MenuItem,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        help_text="The menu item being reviewed"
+    )
+
+    rating = models.PositiveSmallIntegerField(
+        help_text="Rating given by the user (1–5)"
+    )
+
+    comment = models.TextField(
+        blank=True,
+        help_text="Optional text feedback provided by the user"
+    )
+
+    review_date = models.DateTimeField(
+        auto_now_add=True,
+        help_text="Date and time when the review was submitted"
+    )
+
+    class Meta:
+        verbose_name = "User Review"
+        verbose_name_plural = "User Reviews"
+        ordering = ["-review_date"]
+        indexes = [
+            models.Index(fields=["menu_item"]),
+            models.Index(fields=["user"]),
+        ]
+        unique_together = ("user", "menu_item")  # One review per user per item
+
+    def __str__(self):
+        return f"Review by {self.user.username} on {self.menu_item.name} ({self.rating}/5)"

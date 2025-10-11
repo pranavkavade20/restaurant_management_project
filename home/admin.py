@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Feedback, Contact, Address, Restaurant, MenuCategory, Table
+from .models import Feedback, Contact, Address, Restaurant, MenuCategory, Table,UserReview
 
 
 # ------------------------
@@ -93,3 +93,11 @@ class TableAdmin(admin.ModelAdmin):
     list_filter = ("is_available",)
     search_fields = ("table_number",)
     ordering = ("table_number",)
+
+
+@admin.register(UserReview)
+class UserReviewAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "menu_item", "rating", "review_date")
+    search_fields = ("user__username", "menu_item__name", "comment")
+    list_filter = ("rating", "review_date")
+    ordering = ("-review_date",)
