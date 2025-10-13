@@ -93,6 +93,11 @@ class MenuCategory(models.Model):
         db_index=True,
         verbose_name="Category Name"
     )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Description"
+    )
 
     class Meta:
         verbose_name = "Menu Category"

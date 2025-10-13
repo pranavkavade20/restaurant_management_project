@@ -5,10 +5,12 @@ from products.models import MenuItem
 class MenuCategorySerializer(serializers.ModelSerializer):
     """
     Serializer for MenuCategory model.
+    Includes name and optional description.
     """
+
     class Meta:
         model = MenuCategory
-        fields = ["id", "name"]  # Include ID for frontend mapping
+        fields = ["id", "name", "description"]
 
 
 class MenuItemSerializer(serializers.ModelSerializer):

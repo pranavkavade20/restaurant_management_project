@@ -76,7 +76,7 @@ class MenuCategoryAdmin(admin.ModelAdmin):
     """
     Admin configuration for MenuCategory model.
     """
-    list_display = ("id", "name")
+    list_display = ("id", "name","description")
     search_fields = ("name",)
     ordering = ("name",)
 
