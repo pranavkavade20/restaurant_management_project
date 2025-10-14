@@ -146,3 +146,43 @@ def update_order_status(order_id: int, new_status: str) -> dict:
     logger.info(f"Order ID {order_id} status changed from '{old_status}' to '{new_status}'.")
 
     return {"success": True, "message": f"Order status updated to '{new_status}'."}
+
+# orders/utils.py
+
+def calculate_order_total(order_items):
+    """
+    Utility function to calculate the total price of an order.
+
+    Args:
+        order_items (list of dict): A list of dictionaries where each dictionary 
+            represents an order item with 'price' (float or Decimal) and 'quantity' (int).
+            Example:
+            [
+                {"price": 120.50, "quantity": 2},
+                {"price": 80.00, "quantity": 1}
+            ]
+
+    Returns:
+        float: The total cost of all order items.
+    
+    Notes:
+        - Handles empty lists gracefully (returns 0.0).
+        - Ignores invalid items (missing 'price' or 'quantity').
+        - Useful for cart total or order summary before saving.
+    """
+
+    if not order_items:
+        return 0.0  # Return 0 if order list is empty
+
+    total = 0.0
+
+    for item in order_items:
+        # Safely extract price and quantity with defaults
+        price = item.get("price", 0)
+        quantity = item.get("quantity", 0)
+
+        # Ensure valid numeric types
+        if isinstance(price, (int, float)) and isinstance(quantity, int):
+            total += price * quantity
+
+    return round(total, 2)  # Round for clean output
