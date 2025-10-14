@@ -13,11 +13,10 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 # Local modules
 from .forms import ContactForm, FeedbackForm
 from .models import MenuCategory, Contact
-from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer,DailySpecialSerializer,UserReviewSerializer
+from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer,DailySpecialSerializer,UserReviewSerializer,RestaurantSerializer
 from .utils import send_email_async
 from products.models import MenuItem
 from .models import Restaurant, Table, UserReview
-
 # ==========================
 # Web Views
 # ==========================
@@ -280,3 +279,23 @@ class MenuItemReviewListView(generics.ListAPIView):
     def get_queryset(self):
         menu_item_id = self.kwargs.get("menu_item_id")
         return UserReview.objects.filter(menu_item_id=menu_item_id).select_related("user", "menu_item").order_by("-review_date")
+
+
+
+class RestaurantInfoView(generics.GenericAPIView):
+    """
+    API endpoint to retrieve all details about the restaurant.
+    GET: Returns restaurant information as JSON.
+    """
+    serializer_class = RestaurantSerializer
+
+    def get(self, request, *args, **kwargs):
+        restaurant = Restaurant.objects.first()  # assuming only one restaurant record
+        if not restaurant:
+            return Response(
+                {"detail": "Restaurant information not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = self.get_serializer(restaurant)
+        return Response(serializer.data, status=status.HTTP_200_OK)

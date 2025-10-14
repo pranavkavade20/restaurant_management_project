@@ -16,7 +16,8 @@ from .views import (
     TableListAPIView,
     DailySpecialsAPIView,
     UserReviewCreateView,
-    MenuItemReviewListView
+    MenuItemReviewListView,
+    RestaurantInfoView,
 )
 
 # DRF Router for ViewSets
@@ -31,6 +32,7 @@ urlpatterns = [
     path("contact/", contact_view, name="contact"),
     path("reservations/", reservations_view, name="reservations"),
     path("feedback/", feedback_view, name="feedback"),
+    path('restaurant/info/', RestaurantInfoView.as_view(), name='restaurant-info'),
 
     # Custom 404 page (for testing)
     path("404-test/", custom_404_view, name="trigger_404"),
