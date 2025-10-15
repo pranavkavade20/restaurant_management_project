@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView 
+from rest_framework.generics import ListAPIView
 
 # Local modules
 from .forms import ContactForm, FeedbackForm
@@ -19,7 +20,6 @@ from .utils import send_email_async
 from utils.validation_utils import is_valid_email
 from products.models import MenuItem
 from .models import Restaurant, Table, UserReview
-
 
 # ==========================
 # Web Views
@@ -173,8 +173,6 @@ class MenuItemViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ["name"]
 
-
-
 class ContactCreateAPIView(generics.CreateAPIView):
     """
     API endpoint to handle contact form submissions.
@@ -304,9 +302,6 @@ class RestaurantInfoView(generics.GenericAPIView):
         serializer = self.get_serializer(restaurant)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-
-
 class EmailValidationView(APIView):
     """
     Simple API endpoint to validate an email address.
@@ -321,3 +316,11 @@ class EmailValidationView(APIView):
             return Response({"message": "Email is valid."}, status=status.HTTP_200_OK)
         else:
             return Response({"message": "Invalid email address."}, status=status.HTTP_400_BAD_REQUEST)
+
+class MenuCategoryListView(ListAPIView):
+    """
+    API endpoint to list all restaurant menu categories.
+    Returns a JSON response containing category names and descriptions.
+    """
+    queryset = MenuCategory.objects.all().order_by("name")
+    serializer_class = MenuCategorySerializer
