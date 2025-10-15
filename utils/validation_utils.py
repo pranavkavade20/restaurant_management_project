@@ -9,13 +9,16 @@ def is_valid_email(email: str) -> bool:
     Validate an email address using Python's email-validator library.
 
     Args:
-        email (str): Email address to validate.
+        email (str): The email address to validate.
 
     Returns:
         bool: True if valid, False otherwise.
+
+    This function checks the syntax of an email using the `email-validator` library.
+    It avoids regex-based pitfalls and ensures more accurate validation for modern email formats.
     """
     try:
-        # validate_email will raise EmailNotValidError if not valid
+        # validate_email() raises EmailNotValidError if invalid
         validate_email(email, check_deliverability=False)
         return True
     except EmailNotValidError as e:

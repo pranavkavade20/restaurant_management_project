@@ -9,14 +9,18 @@ from rest_framework import viewsets, generics, status, filters, permissions
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.views import APIView 
 
 # Local modules
 from .forms import ContactForm, FeedbackForm
 from .models import MenuCategory, Contact
 from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer,DailySpecialSerializer,UserReviewSerializer,RestaurantSerializer
 from .utils import send_email_async
+from utils.validation_utils import is_valid_email
 from products.models import MenuItem
 from .models import Restaurant, Table, UserReview
+
+
 # ==========================
 # Web Views
 # ==========================
@@ -299,3 +303,21 @@ class RestaurantInfoView(generics.GenericAPIView):
 
         serializer = self.get_serializer(restaurant)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+class EmailValidationView(APIView):
+    """
+    Simple API endpoint to validate an email address.
+    """
+
+    def post(self, request):
+        email = request.data.get("email")
+        if not email:
+            return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if is_valid_email(email):
+            return Response({"message": "Email is valid."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Invalid email address."}, status=status.HTTP_400_BAD_REQUEST)
