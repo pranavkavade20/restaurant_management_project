@@ -9,7 +9,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-
 class MenuItem(models.Model):
     """
     Represents a food or drink item available on the restaurant menu.
@@ -31,6 +30,12 @@ class MenuItem(models.Model):
         help_text="Mark this item as a daily special"
     )
 
+    # 🔹 New field for availability
+    is_available = models.BooleanField(
+        default=True,
+        help_text="Indicates whether the menu item is currently available"
+    )
+
     class Meta:
         verbose_name = "Menu Item"
         verbose_name_plural = "Menu Items"
@@ -38,3 +43,4 @@ class MenuItem(models.Model):
 
     def __str__(self):
         return f"{self.name} --> {self.price}"
+
