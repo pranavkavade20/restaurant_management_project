@@ -1,8 +1,10 @@
 from django.db import models
-from multiselectfield import MultiSelectField
 from django.contrib.auth.models import User
-from products.models import MenuItem
+from datetime import datetime, timedelta, time
+from multiselectfield import MultiSelectField
 
+from products.models import MenuItem
+from .utils import is_restaurant_open  # Import your existing utility
 
 # ------------------------
 # Feedback Model
@@ -169,3 +171,60 @@ class UserReview(models.Model):
 
     def __str__(self):
         return f"Review by {self.user.username} on {self.menu_item.name} ({self.rating}/5)"
+
+class Reservation(models.Model):
+    """
+    Represents a restaurant table reservation.
+    """
+    customer_name = models.CharField(max_length=100)
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    table_number = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"Reservation for {self.customer_name} on {self.date} (Table {self.table_number})"
+
+    @classmethod
+    def find_available_slots(cls, date, start_range, end_range, slot_duration_minutes=60):
+        """
+        Finds available reservation slots within a given date and time range.
+        Uses the is_restaurant_open() utility to ensure slots are within operating hours.
+
+        Args:
+            date (datetime.date): The date to check for available reservations.
+            start_range (datetime.time): Start of the desired time range.
+            end_range (datetime.time): End of the desired time range.
+            slot_duration_minutes (int): Duration of each reservation slot in minutes.
+
+        Returns:
+            list: A list of tuples (start_time, end_time) representing available slots.
+        """
+
+        # Check if restaurant is open before proceeding
+        if not is_restaurant_open():
+            return []
+
+        # Fetch existing reservations for that date
+        existing_reservations = cls.objects.filter(date=date).order_by("start_time")
+
+        # Generate all possible slots within the provided range
+        slots = []
+        current_start = datetime.combine(date, start_range)
+        end_datetime = datetime.combine(date, end_range)
+
+        while current_start + timedelta(minutes=slot_duration_minutes) <= end_datetime:
+            current_end = current_start + timedelta(minutes=slot_duration_minutes)
+
+            # Check if this slot overlaps with any existing reservation
+            overlap = existing_reservations.filter(
+                start_time__lt=current_end.time(),
+                end_time__gt=current_start.time()
+            ).exists()
+
+            if not overlap:
+                slots.append((current_start.time(), current_end.time()))
+
+            current_start = current_end
+
+        return slots
