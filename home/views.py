@@ -15,11 +15,11 @@ from rest_framework.generics import ListAPIView
 # Local modules
 from .forms import ContactForm, FeedbackForm
 from .models import MenuCategory, Contact
-from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer,DailySpecialSerializer,UserReviewSerializer,RestaurantSerializer
+from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer,DailySpecialSerializer,UserReviewSerializer,RestaurantSerializer,OpeningHourSerializer
 from .utils import send_email_async
 from utils.validation_utils import is_valid_email
 from products.models import MenuItem
-from .models import Restaurant, Table, UserReview
+from .models import Restaurant, Table, UserReview, OpeningHour
 
 # ==========================
 # Web Views
@@ -324,3 +324,13 @@ class MenuCategoryListView(ListAPIView):
     """
     queryset = MenuCategory.objects.all().order_by("name")
     serializer_class = MenuCategorySerializer
+
+
+
+
+class OpeningHourListAPIView(generics.ListAPIView):
+    """
+    API endpoint to retrieve the restaurant's opening hours.
+    """
+    queryset = OpeningHour.objects.all()
+    serializer_class = OpeningHourSerializer

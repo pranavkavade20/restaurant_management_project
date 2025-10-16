@@ -228,3 +228,29 @@ class Reservation(models.Model):
             current_start = current_end
 
         return slots
+
+class OpeningHour(models.Model):
+    """
+    Represents the restaurant's opening and closing hours for each day of the week.
+    """
+    DAYS_OF_WEEK = [
+        ('Monday', 'Monday'),
+        ('Tuesday', 'Tuesday'),
+        ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'),
+        ('Friday', 'Friday'),
+        ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday'),
+    ]
+
+    day = models.CharField(max_length=10, choices=DAYS_OF_WEEK, unique=True)
+    opening_time = models.TimeField(help_text="Opening time (HH:MM format)")
+    closing_time = models.TimeField(help_text="Closing time (HH:MM format)")
+
+    class Meta:
+        verbose_name = "Opening Hour"
+        verbose_name_plural = "Opening Hours"
+        ordering = ['day']
+
+    def __str__(self):
+        return f"{self.day}: {self.opening_time} - {self.closing_time}"
