@@ -111,7 +111,7 @@ class NewsletterSubscriptionSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid email address format.")
         return value
 
-class Opening_HoursSerializer(serializers.ModelSerializer):
+class OpeningHoursSerializer(serializers.ModelSerializer):
     class Meta:
         model = Opening_Hours
         fields = ['day','opening_time','closing_time']
