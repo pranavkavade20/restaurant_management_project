@@ -119,7 +119,6 @@ def custom_404_view(request, exception=None):
     """Custom 404 error handler."""
     return render(request, "404.html", status=404)
 
-# API Views
 class MenuCategoryViewSet(viewsets.ModelViewSet):
     """
     API ViewSet to handle CRUD operations for MenuCategory.
@@ -269,7 +268,6 @@ class UserReviewCreateView(generics.CreateAPIView):
         serializer.save(user=request.user, menu_item=menu_item)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 class MenuItemReviewListView(generics.ListAPIView):
     """
