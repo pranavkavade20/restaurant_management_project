@@ -280,8 +280,6 @@ class MenuItemReviewListView(generics.ListAPIView):
         menu_item_id = self.kwargs.get("menu_item_id")
         return UserReview.objects.filter(menu_item_id=menu_item_id).select_related("user", "menu_item").order_by("-review_date")
 
-
-
 class RestaurantInfoView(generics.GenericAPIView):
     """
     API endpoint to retrieve all details about the restaurant.
@@ -322,6 +320,7 @@ class MenuCategoryListView(ListAPIView):
     """
     queryset = MenuCategory.objects.all().order_by("name")
     serializer_class = MenuCategorySerializer
+
 
 class OpeningHourListAPIView(generics.ListAPIView):
     """
