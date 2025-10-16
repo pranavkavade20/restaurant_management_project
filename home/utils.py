@@ -1,5 +1,3 @@
-# home/utils.py
-
 from django.core.mail import EmailMessage
 from django.conf import settings
 import logging
@@ -67,10 +65,6 @@ def is_restaurant_open() -> bool:
 
     # Check if current time is within operating hours
     return open_time <= current_time <= close_time
-
-
-# home/utils.py
-import logging
 
 # Configure logger
 logger = logging.getLogger(__name__)
