@@ -4,9 +4,8 @@ from datetime import date
 from decimal import Decimal
 from django.db.models import Sum
 from django.core.exceptions import ObjectDoesNotExist
-# -------------------------
+
 # Coupon code utility
-# -------------------------
 def generate_coupon_code(length: int = 10) -> str:
     from .models import Coupon  # lazy import
 
@@ -16,10 +15,7 @@ def generate_coupon_code(length: int = 10) -> str:
         if not Coupon.objects.filter(code=code).exists():
             return code
 
-
-# -------------------------
 # Unique order id utility
-# -------------------------
 def generate_unique_order_id(length: int = 8) -> str:
     from .models import Order  # lazy import
 
@@ -29,10 +25,7 @@ def generate_unique_order_id(length: int = 8) -> str:
         if not Order.objects.filter(custom_order_id=order_id).exists():
             return order_id
 
-
-# -------------------------
 # Daily sales helper
-# -------------------------
 def get_daily_sales_total(target_date: date) -> float:
     from .models import Order  # lazy import
 
@@ -46,11 +39,10 @@ def get_daily_sales_total(target_date: date) -> float:
     )
     return float(result or 0)
 
-
-# -------------------------
 # Discount utility (NEW)
-# -------------------------
+
 def calculate_discount(amount: Decimal, coupon=None) -> Decimal:
+
     """
     Calculate discount amount for a given monetary amount using a Coupon.
 
