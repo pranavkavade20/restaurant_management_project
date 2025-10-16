@@ -1,7 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-
 class ReviewPagination(PageNumberPagination):
     page_size = 5  # default items per page
     page_size_query_param = 'page_size'  # allow frontend to override
