@@ -26,19 +26,19 @@ class MenuItem(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # 🔹 Field for marking daily specials
+    # Field for marking daily specials
     is_daily_special = models.BooleanField(
         default=False,
         help_text="Mark this item as a daily special"
     )
 
-    # 🔹 Field for availability
+    # Field for availability
     is_available = models.BooleanField(
         default=True,
         help_text="Indicates whether the menu item is currently available"
     )
 
-    # 🔹 New field for discount percentage
+    # New field for discount percentage
     discount_percentage = models.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -54,7 +54,7 @@ class MenuItem(models.Model):
     def __str__(self):
         return f"{self.name} --> {self.price}"
 
-    # ✅ Method to calculate final price considering discount
+    # Method to calculate final price considering discount
     def get_final_price(self) -> Decimal:
         """
         Calculate the final price of the menu item after applying any discount.
