@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MenuCategory, Contact,Table,UserReview,Restaurant
+from .models import MenuCategory, Contact,Table,UserReview,Restaurant,Opening_Hours
 from products.models import MenuItem
 from utils.validation_utils import is_valid_email
 
