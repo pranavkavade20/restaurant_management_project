@@ -19,8 +19,8 @@ from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSeri
 from .utils import send_email_async
 from utils.validation_utils import is_valid_email
 from products.models import MenuItem
-from .models import Restaurant, Table, UserReview, OpeningHour
-
+from .models import Restaurant, Table, UserReview, OpeningHour,UserReview
+from .pagination import ReviewPagination
 # ==========================
 # Web Views
 # ==========================
@@ -325,12 +325,17 @@ class MenuCategoryListView(ListAPIView):
     queryset = MenuCategory.objects.all().order_by("name")
     serializer_class = MenuCategorySerializer
 
-
-
-
 class OpeningHourListAPIView(generics.ListAPIView):
     """
     API endpoint to retrieve the restaurant's opening hours.
     """
     queryset = OpeningHour.objects.all()
     serializer_class = OpeningHourSerializer
+
+class UserReviewListAPIView(generics.ListAPIView):
+    """
+    API endpoint to retrieve paginated user reviews.
+    """
+    queryset = UserReview.objects.select_related("user", "menu_item").order_by("-review_date")
+    serializer_class = UserReviewSerializer
+    pagination_class = ReviewPagination

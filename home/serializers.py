@@ -66,9 +66,6 @@ class DailySpecialSerializer(serializers.ModelSerializer):
         model = MenuItem
         fields = ["id", "name", "description", "price", "image", "category_name"]
 
-
-
-
 class UserReviewSerializer(serializers.ModelSerializer):
     """
     Serializer for UserReview model.
