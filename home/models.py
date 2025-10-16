@@ -76,17 +76,14 @@ class Restaurant(models.Model):
         blank=True,
         help_text="Days when the restaurant is open (e.g., Mon, Tue, Wed)"
     )
-    def get_total_menu_items(self) -> int:
-        """
-        Returns the total number of menu items currently listed
-        for this restaurant.
 
-        Returns:
-            int: The total count of menu items in the database.
+    def get_total_menu_items(self)-> int:
+        """
+        Returns : int : The total count of menu items in the database.
         """
         total_items = MenuItem.objects.count()
         return total_items
-    
+
     def __str__(self):
         return self.name
 
