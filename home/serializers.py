@@ -114,6 +114,7 @@ class OpeningHoursSerializer(serializers.ModelSerializer):
         model = OpeningHour
         fields = ['day','opening_time','closing_time']
 
+
 class MenuItemSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
