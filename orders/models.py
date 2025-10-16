@@ -6,8 +6,8 @@ from decimal import Decimal
 from products.models import MenuItem
 from .utils import generate_unique_order_id, calculate_discount
 
-
 class OrderStatus(models.Model):
+    
     """
     Represents different statuses of an order 
     (e.g., Pending, Processing, Delivered, Cancelled).
