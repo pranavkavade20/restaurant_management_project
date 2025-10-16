@@ -15,7 +15,7 @@ from rest_framework.generics import ListAPIView
 # Local modules
 from .forms import ContactForm, FeedbackForm
 from .models import MenuCategory, Contact
-from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer,DailySpecialSerializer,UserReviewSerializer,RestaurantSerializer,OpeningHourSerializer
+from .serializers import MenuCategorySerializer, MenuItemSerializer, ContactSerializer,TableSerializer,DailySpecialSerializer,UserReviewSerializer,RestaurantSerializer,OpeningHoursSerializer,MenuItemSearchSerializer
 from .utils import send_email_async
 from utils.validation_utils import is_valid_email
 from products.models import MenuItem
@@ -330,7 +330,7 @@ class OpeningHourListAPIView(generics.ListAPIView):
     API endpoint to retrieve the restaurant's opening hours.
     """
     queryset = OpeningHour.objects.all()
-    serializer_class = OpeningHourSerializer
+    serializer_class = OpeningHoursSerializer
 
 class UserReviewListAPIView(generics.ListAPIView):
     """
@@ -339,3 +339,23 @@ class UserReviewListAPIView(generics.ListAPIView):
     queryset = UserReview.objects.select_related("user", "menu_item").order_by("-review_date")
     serializer_class = UserReviewSerializer
     pagination_class = ReviewPagination
+
+class MenuItemSearchAPIView(generics.ListAPIView):
+    """
+    API endpoint to search menu items by name (case-insensitive).
+    Example: /api/menu/search/?q=pizza
+    """
+    serializer_class = MenuItemSearchSerializer
+
+    def get_queryset(self):
+        query = self.request.query_params.get("q", "").strip()
+        if query:
+            return MenuItem.objects.filter(name__icontains=query, is_available=True)
+        return MenuItem.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if not queryset.exists():
+            return Response({"message": "No matching menu items found."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

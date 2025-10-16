@@ -20,7 +20,8 @@ from .views import (
     RestaurantInfoView,
     EmailValidationView,
     MenuCategoryListView,
-    OpeningHourListAPIView
+    OpeningHourListAPIView,
+    MenuItemSearchAPIView
 )
 
 # DRF Router for ViewSets
@@ -67,4 +68,5 @@ urlpatterns = [
     path("validate-email/", EmailValidationView.as_view(), name="validate-email"),
     path("categories/", MenuCategoryListView.as_view(), name="menu-category-list"),
     path("opening-hours/", OpeningHourListAPIView.as_view(), name="opening-hours"),
+    path("menu/search/", MenuItemSearchAPIView.as_view(), name="menu-item-search"),
 ]

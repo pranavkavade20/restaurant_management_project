@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MenuCategory, Contact,Table,UserReview,Restaurant,Opening_Hours
+from .models import MenuCategory, Contact,Table,UserReview,Restaurant,OpeningHour
 from products.models import MenuItem
 from utils.validation_utils import is_valid_email
 
@@ -101,8 +101,6 @@ class RestaurantSerializer(serializers.ModelSerializer):
             'operating_days',
         ]
 
-
-
 class NewsletterSubscriptionSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -113,5 +111,10 @@ class NewsletterSubscriptionSerializer(serializers.Serializer):
 
 class OpeningHoursSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Opening_Hours
+        model = OpeningHour
         fields = ['day','opening_time','closing_time']
+
+class MenuItemSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MenuItem
+        fields = ["id", "name", "image"]  # Only return essential fields
