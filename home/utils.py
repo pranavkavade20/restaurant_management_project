@@ -67,3 +67,46 @@ def is_restaurant_open() -> bool:
 
     # Check if current time is within operating hours
     return open_time <= current_time <= close_time
+
+
+# home/utils.py
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
+
+def calculate_discount(original_price, discount_percentage):
+    """
+    Calculate the discounted price based on the original price and discount percentage.
+
+    Args:
+        original_price (float or Decimal): The original price of the item.
+        discount_percentage (float): The discount percentage (0-100).
+
+    Returns:
+        float: The final discounted price.
+
+    Raises:
+        ValueError: If inputs are invalid (e.g., negative price or invalid percentage).
+    """
+    try:
+        # ✅ Convert input to float for safety
+        original_price = float(original_price)
+        discount_percentage = float(discount_percentage)
+
+        # ✅ Validate inputs
+        if original_price < 0:
+            raise ValueError("Original price cannot be negative.")
+        if not (0 <= discount_percentage <= 100):
+            raise ValueError("Discount percentage must be between 0 and 100.")
+
+        # ✅ Calculate discounted price
+        discounted_price = original_price * (1 - discount_percentage / 100)
+        return round(discounted_price, 2)
+
+    except (ValueError, TypeError) as e:
+        logger.warning(f"Invalid discount calculation input: price={original_price}, discount={discount_percentage}. Error: {e}")
+        return original_price  # Return original price as fallback
+    except Exception as e:
+        logger.error(f"Unexpected error during discount calculation: {e}")
+        return original_price
