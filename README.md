@@ -36,7 +36,7 @@ This project's structure covers key restaurant operations:
 
 ```bash
 # Clone the repository
-git clone [YOUR-REPOSITORY-URL]
+git clone https://github.com/pranavkavade20/restaurant_management_project.git
 cd restaurant-management-system
 
 # Create and activate a virtual environment
