@@ -329,8 +329,36 @@ class OpeningHourListAPIView(generics.ListAPIView):
     queryset = OpeningHour.objects.all()
     serializer_class = OpeningHourSerializer
 
-class MenuItemSerializer(serializer.ModelSerializer):
-    class Meta:
-        model= MenuItem
-        fields = ["id","name","image"]
-        
+class MenuItemPriceRangeView(generics.ListAPIView):
+    """
+    API endpoint to retrieve menu Items within specific range.
+    """
+    serializer_class = MenuItemSerializer
+    def get_queryset(self):
+        queryset = MenuItem.objects.all()
+        min_price = self.request.query_params.get('min_price')
+        max_price = self.request.query_params.get('max_price')
+
+        try:
+            if min_price is not None:
+                min_price = float(min_price)
+                queryset = queryset.filter(price__gte=min_price)
+            if max_price is not None :
+                max_price = float(max_price) 
+                queryset = queryset.filter(price__lte=max_price)
+        except ValueError:
+            #Handle invalid number inputs gracefully
+            return MenuItem.objects.none()
+
+        return queryset
+    def list(self,request,*args,**kwargs):
+        queryset = self.get_queryset()
+        if not queryset.exists():
+            return Response(
+                {
+                    "message":"No menu items found in the specified price range.",
+                    status=status.HTTP_404_NOT_FOUND
+                }
+            )
+        serializer = self.get_serializer(queryset,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
